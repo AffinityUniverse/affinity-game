@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Affinity Game Universe</title>
+<style>
+html,body { width:100%;height:100%;min-height:100%;margin:0;padding:0;overflow:hidden;background:#80caff; }
+* { box-sizing:border-box; }
+/* Image-based full-screen game selection */
+.game-choice-overlay{
+  position:fixed!important;inset:0!important;z-index:6500;
+  display:flex;justify-content:center;align-items:stretch;
+  width:100vw;height:100vh;height:100dvh;
+  padding:0!important;margin:0;
+  background:#80caff url("bg.png") center center / cover no-repeat!important;
+  overflow:hidden!important;opacity:1;pointer-events:auto;
+  transition:opacity .28s ease;
+}
+.game-choice-overlay.hide{opacity:0;pointer-events:none}
+.game-choice-card{
+  width:100%!important;height:100%!important;max-width:none!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:clamp(24px,5vh,64px) 20px clamp(30px,7vh,84px)!important;
+  margin:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+.game-choice-title{
+  display:block;width:min(78vw,850px);max-height:48vh;object-fit:contain;
+  animation:gameTitleFloat 3.6s ease-in-out infinite;
+  transform-origin:center center;
+  filter:drop-shadow(0 12px 18px rgba(22,45,85,.12));
+  pointer-events:none;
+}
+@keyframes gameTitleFloat{
+  0%,100%{transform:translate3d(0,0,0) rotate(-1deg)}
+  50%{transform:translate3d(0,-16px,0) rotate(1deg)}
+}
+.game-choice-grid{
+  display:flex!important;justify-content:center;align-items:center;
+  width:min(900px,96vw)!important;gap:clamp(12px,3vw,40px)!important;
+  margin:0!important;flex-shrink:0;
+}
+.game-choice-option{
+  display:block!important;flex:0 1 360px;min-width:0!important;
+  height:auto!important;min-height:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  appearance:none;cursor:pointer;
+  transition:transform .2s ease,filter .2s ease;
+}
+.game-choice-option img{display:block;width:100%;height:auto;max-height:24vh;object-fit:contain;pointer-events:none}
+.game-choice-option:hover{transform:translateY(-7px) scale(1.035);filter:brightness(1.06)}
+.game-choice-option:active{transform:translateY(1px) scale(.97)}
+.game-choice-option:focus-visible{outline:3px solid #fff;outline-offset:5px;border-radius:12px!important}
+@media(max-width:700px){
+  .game-choice-card{padding:clamp(20px,5vh,40px) 12px clamp(20px,6vh,50px)!important}
+  .game-choice-title{width:min(94vw,560px);max-height:40vh}
+  .game-choice-grid{gap:10px!important;width:100%!important}
+  .game-choice-option{flex:1 1 0}
+  .game-choice-option img{max-height:20vh}
+}
+@media(prefers-reduced-motion:reduce){.game-choice-title{animation:none}.game-choice-option{transition:none}}
+/* The only layout change: fit three original PNG buttons side by side. */
+.game-choice-grid {
+  width:min(930px,94vw) !important;
+  gap:clamp(8px,2.25vw,27px) !important;
+}
+.game-choice-option { flex:0 1 270px !important; }
+.game-choice-option img { width:100%;height:auto;max-height:23vh;object-fit:contain; }
+@media(max-width:700px) {
+  .game-choice-grid { width:100% !important; gap:clamp(5px,1.8vw,10px) !important; }
+  .game-choice-option { flex:1 1 0 !important; }
+  .game-choice-option img { max-height:19vh; }
+}
+</style>
+</head>
+<body>
+<div class="game-choice-overlay" id="gameChoiceOverlay">
+  <div class="game-choice-card">
+    <img class="game-choice-title" src="title.png" alt="AFFINITY GAME UNIVERSE" draggable="false">
+    <div class="game-choice-grid">
+      <a class="game-choice-option" href="shortcut.html" aria-label="단축키 게임 시작">
+        <img src="btn1.png" alt="단축키 게임" draggable="false">
+      </a>
+      <a class="game-choice-option" href="typinggame.html" aria-label="타이핑 게임 시작">
+        <img src="btn2.png" alt="타이핑 게임" draggable="false">
+      </a>
+      <a class="game-choice-option" href="tutorial.html" aria-label="튜토리얼 게임 시작">
+        <img src="btn3.png" alt="튜토리얼 게임" draggable="false">
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
