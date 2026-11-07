@@ -1758,7 +1758,10 @@ $('#typingFinalReplayBtn')?.addEventListener('click',restart);
 $('#typingFinalCloseBtn')?.addEventListener('click',closeFinalAndShowRankings);
 $('#startBtn').onclick=()=>start(true,true);$('#resetBtn').onclick=restart;$('#pauseBtn').onclick=pause;$('#fullBtn').onclick=async()=>{soundButtonClick();const app=$('#app');try{if(!document.fullscreenElement)await app.requestFullscreen?.();else await document.exitFullscreen?.()}catch(e){}syncFullscreenButton()};document.addEventListener('fullscreenchange',syncFullscreenButton);syncFullscreenButton();
 language.onchange=updateUI;category.onchange=updateUI;window.addEventListener('resize',()=>state.cards.forEach(c=>{c.x=Math.min(c.x,game.clientWidth-210);renderCard(c)}));
-setShortcutCharacters(BUILTIN_SHORTCUT_CHARACTERS);
+// Apply the typing language chosen on the main menu, if supplied.
+ const initialTypingLanguage = new URLSearchParams(window.location.search).get('lang');
+ if(initialTypingLanguage === 'ko' || initialTypingLanguage === 'en') language.value = initialTypingLanguage;
+ setShortcutCharacters(BUILTIN_SHORTCUT_CHARACTERS);
 renderRankings();renderReview();updateUI();
 </script>
 
