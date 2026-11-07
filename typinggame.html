@@ -947,6 +947,7 @@ html, body {
 #app .af-final-close-v58:focus-visible {outline:3px solid #7fb5ff;outline-offset:3px;}
 @media(max-width:840px){#app .af-final-close-v58{top:10px;right:10px;width:32px;height:32px;min-width:32px;font-size:24px;}}
 </style>
+
 </head>
 <body>
 <main class="app" id="app">
@@ -1867,6 +1868,811 @@ renderRankings();renderReview();updateUI();
 }
 @media(prefers-reduced-motion:reduce){
   #app .game .gameover:not(.complete) > strong {animation:none !important;opacity:1 !important}
+}
+</style>
+<style id="typingShortcutTrueLayoutMatch20261107">
+/* Typography and spacing matched to the desktop Shortcut Challenge UI. */
+html, body {
+  background: #0B1328 !important;
+}
+#app.app {
+  padding: clamp(14px,2vw,28px) !important;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(56,111,214,.20), transparent 28%),
+    radial-gradient(circle at 88% 4%, rgba(56,104,190,.11), transparent 24%),
+    radial-gradient(circle at 74% 92%, rgba(28,74,154,.10), transparent 30%),
+    linear-gradient(145deg,#0B1328 0%,#10234A 48%,#0A142A 100%) !important;
+}
+#app .header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 24px !important;
+  margin: 0 0 14px !important;
+}
+#app .header > div:first-child {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  padding: 10px 0 2px !important;
+}
+#app .kicker {
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  font-size: 10px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+  letter-spacing: .15em !important;
+  color: #72a9ff !important;
+}
+#app .header h1 {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: clamp(32px,3.7vw,50px) !important;
+  line-height: 1.04 !important;
+  font-weight: 760 !important;
+  letter-spacing: -.04em !important;
+  white-space: nowrap !important;
+}
+#app .header p {
+  margin: 10px 0 0 !important;
+  color: #cbd6ea !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  font-weight: 500 !important;
+}
+#app .stats {
+  display: grid !important;
+  flex: 0 1 auto !important;
+  grid-template-columns: repeat(4,minmax(92px,1fr)) !important;
+  width: auto !important;
+  min-width: min(500px,100%) !important;
+  max-width: none !important;
+  margin: 0 !important;
+  gap: 8px !important;
+}
+#app .stat {
+  display: block !important;
+  height: auto !important;
+  min-width: 0 !important;
+  padding: 13px 11px !important;
+  border-radius: 14px !important;
+  text-align: center !important;
+  background: rgba(14,26,50,.82) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: none !important;
+}
+#app .stat span {
+  display: block !important;
+  margin: 0 0 5px !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  letter-spacing: .01em !important;
+  line-height: normal !important;
+  color: #91a1bd !important;
+}
+#app .stat strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 24px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+  color: #fff !important;
+  white-space: nowrap !important;
+}
+#app .stat strong.hearts {
+  font-size: clamp(17px,2vw,25px) !important;
+  letter-spacing: -1px !important;
+  white-space: nowrap !important;
+}
+#app .toolbar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 12px !important;
+}
+#app .toolbar .btn {
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border-radius: 11px !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  background: rgba(17,32,61,.90) !important;
+  color: #cbd6ea !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+#app .toolbar .btn.primary {
+  background: #0068ff !important;
+  border-color: rgba(255,255,255,.10) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(0,104,255,.22) !important;
+}
+#app .toolbar .btn.resume-active {
+  background: #ff7a21 !important;
+  border-color: #ff7a21 !important;
+  color: #fff !important;
+}
+#app .toolbar .btn:focus-visible, #app .field input:focus-visible,
+#app .field select:focus-visible {outline:2px solid #78aaff !important;outline-offset:2px !important;}
+#app .setup {
+  padding: 0 !important;
+  margin: 0 0 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+#app .setup-grid {
+  display: grid !important;
+  grid-template-columns: 1fr .72fr .92fr minmax(220px,1.05fr) !important;
+  gap: 9px !important;
+}
+#app .field {
+  min-width: 0 !important;
+  border-radius: 14px !important;
+  padding: 12px 13px !important;
+  background: rgba(14,26,50,.82) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+}
+#app .field label {
+  display: block !important;
+  margin: 0 0 8px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: normal !important;
+  letter-spacing: -.01em !important;
+}
+#app .field input, #app .field select {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 11px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  background: rgba(5,27,64,.46) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  box-shadow: none !important;
+}
+#app .character-panel {
+  margin: 0 0 12px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: rgba(14,26,50,.82) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+}
+#app .character-title {
+  margin: 0 0 9px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: normal !important;
+  letter-spacing: -.01em !important;
+}
+#app .characters {
+  display: grid !important;
+  grid-template-columns: repeat(12,minmax(0,1fr)) !important;
+  gap: 7px !important;
+  min-height: 92px !important;
+}
+#app .char {
+  min-width: 0 !important;
+  height: 88px !important;
+  padding: 5px !important;
+  border-radius: 12px !important;
+  background: rgba(5,27,64,.34) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: none !important;
+}
+#app .char.selected {
+  border-color: rgba(0,104,255,.52) !important;
+  background: rgba(0,104,255,.18) !important;
+  box-shadow: inset 0 0 0 3px rgba(0,104,255,.08) !important;
+}
+#app .levelbar {
+  display: grid !important;
+  grid-template-columns: minmax(190px,.55fr) minmax(0,1fr) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 10px !important;
+  padding: 11px 13px !important;
+  border-radius: 14px !important;
+  background: rgba(14,26,50,.82) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+}
+#app .levelbar h3 {
+  margin: 0 0 4px !important;
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+#app .levelbar p {
+  margin: 0 !important;
+  color: #91a1bd !important;
+  font-size: 13px !important;
+}
+#app .progress-meta {
+  color: #91a1bd !important;
+  font-size: 13px !important;
+  font-weight: 550 !important;
+}
+#app .progress-meta strong {color:#9bc0ff !important;font-size:13px !important;font-weight:700 !important;}
+#app .progress {height:9px !important;background:rgba(5,27,64,.46) !important;border:1px solid rgba(255,255,255,.09) !important;}
+#app .progress > i {background:linear-gradient(90deg,#0068ff,#4b91ff) !important;}
+#app .game {
+  flex: 1 1 auto !important;
+  min-height: 520px !important;
+  height: auto !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(73,126,226,.10),transparent 34%),
+    linear-gradient(rgba(255,255,255,.020) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.020) 1px,transparent 1px),
+    linear-gradient(180deg,#11264F 0%,#0E2043 52%,#0A1731 100%) !important;
+  background-size: auto,24px 24px,24px 24px,auto !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.028) !important;
+}
+#app .game .zone {
+  background: rgba(8,16,33,.72) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  color: #8fa0bd !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+#app .game .ready strong {
+  font-size: clamp(30px,4.5vw,56px) !important;
+  font-weight: 740 !important;
+  letter-spacing: -.04em !important;
+  text-shadow: 0 14px 36px rgba(0,0,0,.34) !important;
+}
+#app .game .ready span {font-size:16px !important;font-weight:550 !important;color:#cbd6ea !important;}
+#app .game .ready small {font-size:13px !important;color:#7f89a5 !important;}
+#app.typing-in-game .setup,#app.typing-in-game .character-panel {display:none !important;}
+#app.typing-in-game .header > div:first-child {padding:2px 0 !important;}
+#app.typing-in-game .header h1 {font-size:clamp(27px,2.8vw,39px) !important;}
+#app.typing-in-game .header p {font-size:12px !important;}
+#app.typing-in-game .stat {padding:10px 8px !important;}
+#app.typing-in-game .stat strong {font-size:21px !important;}
+#app.typing-in-game .stat strong.hearts {font-size:19px !important;}
+#app.typing-in-game .toolbar {margin:0 0 9px !important;}
+#app.typing-in-game .levelbar {margin:0 0 9px !important;}
+#app.typing-in-game .game {min-height:0 !important;flex:1 1 0 !important;height:auto !important;}
+@media (max-width:1100px) {
+  #app .setup-grid {grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  #app .characters {grid-template-columns:repeat(6,minmax(0,1fr)) !important;}
+}
+@media (max-width:860px) {
+  #app .header {display:block !important;}
+  #app .header > div:first-child {padding:4px 0 2px !important;}
+  #app .header h1 {font-size:clamp(30px,5vw,43px) !important;}
+  #app .stats {margin-top:14px !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  #app .levelbar {grid-template-columns:minmax(0,1fr) !important;}
+  #app .game {min-height:clamp(340px,55dvh,520px) !important;}
+  #app.typing-in-game .stats {margin-top:9px !important;}
+  #app.typing-in-game .header h1 {font-size:clamp(27px,5vw,36px) !important;}
+}
+@media (max-width:560px) {
+  #app .header h1 {font-size:clamp(27px,7vw,39px) !important;}
+  #app .setup-grid {grid-template-columns:minmax(0,1fr) !important;}
+  #app .characters {grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
+  #app .toolbar .btn {min-height:42px !important;height:42px !important;padding:0 12px !important;font-size:12px !important;}
+  #app .stat strong.hearts {font-size:21px !important;}
+  #app .game .ready strong {font-size:clamp(32px,9vw,45px) !important;}
+}
+</style>
+<style id="auUnifiedTopLayoutExactV3">
+/* Shared layout contract for Korean Shortcut + Typing.
+   Both HTML pages contain the very same CSS block: dimensions and breakpoints
+   are intentionally identical, regardless of language/tool-specific controls. */
+html,body { margin:0 !important; padding:0 !important; overflow-x:hidden !important; }
+body { display:block !important; min-height:100vh !important; background:#0b1328 !important; }
+#app.app,
+#affinityShortcutGame .asg-wrap {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:clamp(12px,1.55vw,28px) !important;
+  border-radius:0 !important;
+  border:0 !important;
+}
+#affinityShortcutGame { width:100% !important; max-width:none !important; margin:0 !important; }
+
+/* The shared 2-column grid prevents title length changing scoreboard width. */
+#app .header,
+#affinityShortcutGame .asg-header {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 734px !important;
+  align-items:center !important;
+  column-gap:24px !important;
+  row-gap:14px !important;
+  width:100% !important;
+  height:116px !important;
+  min-height:116px !important;
+  margin:0 0 14px !important;
+  padding:0 !important;
+}
+#app .header > div:first-child,
+#affinityShortcutGame .asg-header > div:first-child {
+  display:block !important;
+  align-self:center !important;
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:116px !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:visible !important;
+}
+#app .kicker,
+#affinityShortcutGame .asg-kicker {
+  display:block !important;
+  width:max-content !important;
+  max-width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  margin:0 0 10px !important;
+  font-size:10px !important;
+  line-height:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.15em !important;
+  color:#72a9ff !important;
+}
+#app .header h1,
+#affinityShortcutGame .asg-header h2 {
+  display:block !important;
+  width:100% !important;
+  margin:0 !important;
+  font-size:clamp(32px,3.7vw,50px) !important;
+  line-height:1.04 !important;
+  letter-spacing:-.04em !important;
+  font-weight:760 !important;
+  white-space:nowrap !important;
+}
+#app .header p,
+#affinityShortcutGame .asg-header p {
+  display:block !important;
+  width:100% !important;
+  margin:10px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.55 !important;
+  font-weight:500 !important;
+  color:#cbd6ea !important;
+}
+#app .stats,
+#affinityShortcutGame .asg-stats {
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  column-gap:8px !important;
+  row-gap:8px !important;
+  justify-self:end !important;
+  align-self:center !important;
+  width:734px !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:70px !important;
+  margin:0 !important;
+}
+#app .stat,
+#affinityShortcutGame .asg-stat {
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:70px !important;
+  min-height:70px !important;
+  padding:10px 9px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+  text-align:center !important;
+}
+#app .stat span,
+#affinityShortcutGame .asg-stat span {
+  display:block !important;
+  flex:0 0 auto !important;
+  height:13px !important;
+  margin:0 0 5px !important;
+  color:#91a1bd !important;
+  font-size:11px !important;
+  line-height:13px !important;
+  letter-spacing:.01em !important;
+  font-weight:650 !important;
+}
+#app .stat strong,
+#affinityShortcutGame .asg-stat strong {
+  display:flex !important;
+  flex:0 0 auto !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:26px !important;
+  min-width:0 !important;
+  margin:0 !important;
+  font-size:24px !important;
+  line-height:26px !important;
+  letter-spacing:-.035em !important;
+  font-weight:760 !important;
+  white-space:nowrap !important;
+  color:#fff !important;
+}
+#app .stat strong.hearts,
+#affinityShortcutGame .asg-heart-stat strong {
+  font-size:24px !important;
+  line-height:26px !important;
+  letter-spacing:-1px !important;
+  gap:0 !important;
+  white-space:nowrap !important;
+}
+#affinityShortcutGame .asg-heart-stat i { font-size:24px !important; line-height:26px !important; }
+
+/* Shared toolbar dimensions; controls remain function-specific. */
+#app .toolbar,
+#affinityShortcutGame .asg-toolbar {
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+  width:100% !important;
+  gap:8px !important;
+  margin:0 0 12px !important;
+  padding:0 !important;
+}
+#app .toolbar > .btn,
+#affinityShortcutGame .asg-toolbar > button {
+  box-sizing:border-box !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex:0 0 auto !important;
+  height:42px !important;
+  min-height:42px !important;
+  padding:0 16px !important;
+  margin:0 !important;
+  border-radius:11px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(17,32,61,.90) !important;
+  color:#cbd6ea !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  box-shadow:none !important;
+}
+#app .toolbar > .btn.primary,
+#affinityShortcutGame .asg-toolbar > #asgStartBtn {
+  background:#0068ff !important;
+  color:#fff !important;
+  box-shadow:0 8px 20px rgba(0,104,255,.22) !important;
+}
+#app .toolbar > .btn.resume-active,
+#affinityShortcutGame .asg-toolbar > #asgPauseBtn.asg-active {
+  background:#ff7a21 !important;
+  color:#fff !important;
+}
+
+/* Form rows use exactly the same 4 column tracks and 91px cards. */
+#app .setup,
+#affinityShortcutGame .asg-setup-panel {
+  box-sizing:border-box !important;
+  width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+#app .setup { margin:0 0 10px !important; }
+#affinityShortcutGame .asg-setup-panel {
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+  margin:0 0 12px !important;
+}
+#app .setup-grid,
+#affinityShortcutGame .asg-setup-row {
+  display:grid !important;
+  grid-template-columns:1fr .72fr .92fr minmax(220px,1.05fr) !important;
+  align-items:stretch !important;
+  width:100% !important;
+  min-height:91px !important;
+  gap:9px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+#app .setup-grid > .field,
+#affinityShortcutGame .asg-setup-row > .asg-field,
+#affinityShortcutGame .asg-setup-row > .asg-mini-card {
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  width:100% !important;
+  min-height:91px !important;
+  height:91px !important;
+  padding:12px 13px !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+  box-shadow:none !important;
+}
+#app .setup-grid > .field { display:flex !important; flex-direction:column !important; gap:8px !important; }
+#affinityShortcutGame .asg-setup-row > .asg-field { display:flex !important; flex-direction:column !important; gap:8px !important; }
+#app .field label,
+#affinityShortcutGame .asg-field > span {
+  display:block !important;
+  flex:0 0 15px !important;
+  height:15px !important;
+  line-height:15px !important;
+  margin:0 !important;
+  padding:0 !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  color:#fff !important;
+}
+#app .field input,
+#app .field select,
+#affinityShortcutGame .asg-field input,
+#affinityShortcutGame .asg-field select {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:100% !important;
+  min-height:42px !important;
+  height:42px !important;
+  margin:0 !important;
+  padding:0 11px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+  background:rgba(5,27,64,.46) !important;
+  color:#fff !important;
+  font-size:13px !important;
+  font-weight:650 !important;
+}
+#affinityShortcutGame .asg-setup-row > .asg-mini-card {justify-content:center !important; gap:4px !important;}
+#affinityShortcutGame .asg-mini-card strong,
+#affinityShortcutGame .asg-mini-card span,
+#affinityShortcutGame .asg-mini-card small { display:block !important; flex:0 0 auto !important; margin:0 !important; }
+
+/* Same 142px character panel, 12 cards and stable artwork. */
+#app .character-panel,
+#affinityShortcutGame .asg-character-panel {
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:142px !important;
+  min-height:142px !important;
+  padding:12px !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+}
+#app .character-panel {margin:0 0 12px !important;}
+#affinityShortcutGame .asg-character-head,
+#app .character-title {
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:15px !important;
+  margin:0 0 9px !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  line-height:15px !important;
+}
+#app .characters,
+#affinityShortcutGame .asg-character-grid {
+  display:grid !important;
+  grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  align-items:stretch !important;
+  width:100% !important;
+  height:92px !important;
+  min-height:92px !important;
+  gap:7px !important;
+}
+#app .char,
+#affinityShortcutGame .asg-char-btn {
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:88px !important;
+  min-height:88px !important;
+  padding:5px !important;
+  margin:0 !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(5,27,64,.34) !important;
+  box-shadow:none !important;
+}
+#app .char.selected,
+#affinityShortcutGame .asg-char-btn.selected {
+  background:rgba(0,104,255,.18) !important;
+  border-color:rgba(0,104,255,.52) !important;
+  box-shadow:inset 0 0 0 3px rgba(0,104,255,.08) !important;
+  transform:none !important;
+}
+#app .char img,
+#affinityShortcutGame .asg-char-btn img {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:76px !important;
+  height:76px !important;
+  max-width:calc(100% - 2px) !important;
+  max-height:76px !important;
+  flex:0 1 auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  transform:none !important;
+  animation:none !important;
+  transition:none !important;
+}
+#affinityShortcutGame .asg-char-btn:hover:not(:disabled),
+#affinityShortcutGame .asg-char-btn:active:not(:disabled) {transform:none !important;}
+
+/* The level/progress bar starts on the same exact line in both games. */
+#app .levelbar,
+#affinityShortcutGame .asg-level-panel {
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:minmax(190px,.55fr) minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:12px !important;
+  width:100% !important;
+  min-height:61px !important;
+  height:61px !important;
+  margin:0 0 10px !important;
+  padding:11px 13px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  border-radius:14px !important;
+  background:rgba(14,26,50,.82) !important;
+}
+#app .levelbar h3,
+#affinityShortcutGame .asg-level-panel > div:first-child > strong {
+  display:block !important;
+  margin:0 0 4px !important;
+  font-size:16px !important;
+  line-height:19px !important;
+  font-weight:700 !important;
+}
+#app .levelbar p,
+#affinityShortcutGame .asg-level-panel > div:first-child > span {
+  display:block !important;
+  margin:0 !important;
+  font-size:13px !important;
+  line-height:16px !important;
+  color:#91a1bd !important;
+}
+#app .progress-meta,
+#affinityShortcutGame .asg-progress-info {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  margin:0 0 7px !important;
+  padding:0 !important;
+  font-size:13px !important;
+  line-height:16px !important;
+  color:#91a1bd !important;
+}
+#app .progress,
+#affinityShortcutGame .asg-progress-bar {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:100% !important;
+  height:9px !important;
+  min-height:9px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(5,27,64,.46) !important;
+}
+
+
+/* Buttons are pixel-identical in both pages, even with different inherited fonts. */
+#app .toolbar > button:nth-child(1),
+#affinityShortcutGame .asg-toolbar > button:nth-child(1) {width:94px !important;}
+#app .toolbar > button:nth-child(2),
+#affinityShortcutGame .asg-toolbar > button:nth-child(2) {width:96px !important;}
+#app .toolbar > button:nth-child(3),
+#affinityShortcutGame .asg-toolbar > button:nth-child(3) {width:99px !important;}
+#app .toolbar > button:nth-child(4),
+#affinityShortcutGame .asg-toolbar > button:nth-child(4) {width:173px !important;}
+/* The idle game zone also matches across narrow layouts. Playing-state viewport
+   rules deliberately remain under each game's original control. */
+#app:not(.typing-in-game) .game,
+#affinityShortcutGame.asg-ready .asg-game-area {
+  box-sizing:border-box !important;
+  flex:0 0 520px !important;
+  height:520px !important;
+  min-height:520px !important;
+  max-height:none !important;
+}
+
+/* Responsive grids are identical; no 2-vs-1-column jump at 860px. */
+@media(max-width:1260px) {
+  #app .header,
+  #affinityShortcutGame .asg-header {
+    height:auto !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    row-gap:14px !important;
+    align-items:start !important;
+  }
+  #app .header > div:first-child,
+  #affinityShortcutGame .asg-header > div:first-child { height:auto !important; min-height:0 !important; }
+  #app .stats,
+  #affinityShortcutGame .asg-stats { width:100% !important; max-width:none !important; justify-self:stretch !important; }
+}
+@media(max-width:1100px) {
+  #app .setup-grid,
+  #affinityShortcutGame .asg-setup-row { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #app .characters,
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    height:183px !important;
+    min-height:183px !important;
+  }
+  #app .character-panel,
+  #affinityShortcutGame .asg-character-panel {height:233px !important; min-height:233px !important;}
+}
+@media(max-width:700px) {
+  #app .setup-grid,
+  #affinityShortcutGame .asg-setup-row { grid-template-columns:1fr !important; }
+  #app .levelbar,
+  #affinityShortcutGame .asg-level-panel {
+    grid-template-columns:minmax(0,1fr) !important;
+    height:104px !important;
+    min-height:104px !important;
+    gap:9px !important;
+  }
+  #app .header h1,
+  #affinityShortcutGame .asg-header h2 {
+    font-size:clamp(29px,7.2vw,40px) !important;
+    white-space:normal !important;
+    word-break:keep-all !important;
+  }
+  #app .header p,
+  #affinityShortcutGame .asg-header p {font-size:13px !important;line-height:1.5 !important;}
+  #app .toolbar > .btn,
+  #affinityShortcutGame .asg-toolbar > button {padding:0 12px !important;font-size:12px !important;}
+}
+@media(max-width:680px) {
+  #app .stats,
+  #affinityShortcutGame .asg-stats {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    height:148px !important;
+  }
+}
+@media(max-width:560px) {
+  #app .characters,
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    height:278px !important;
+    min-height:278px !important;
+  }
+  #app .character-panel,
+  #affinityShortcutGame .asg-character-panel {height:328px !important;min-height:328px !important;}
+  #app .char img,
+  #affinityShortcutGame .asg-char-btn img {
+    width:76px !important;
+    max-width:calc(100% - 2px) !important;
+    height:76px !important;
+  }
+  #app .stat strong.hearts,
+  #affinityShortcutGame .asg-heart-stat strong {font-size:21px !important;}
+  #affinityShortcutGame .asg-heart-stat i {font-size:21px !important;}
+}
+@media(prefers-reduced-motion:reduce) {
+  #app .char img,
+  #affinityShortcutGame .asg-char-btn img {transition:none !important;}
 }
 </style>
 </body>
