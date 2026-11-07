@@ -4248,6 +4248,69 @@ body {
   font-family:"Pinkfong Baby Shark",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
 }
 </style>
+
+<style id="asgCharacterStableTypingMatch20261107">
+/* Character selection follows the typing game's steady, fixed image viewport. */
+#affinityShortcutGame .asg-character-grid {
+  grid-template-columns: repeat(12,minmax(0,1fr)) !important;
+  align-items: stretch !important;
+  min-height: 92px !important;
+}
+#affinityShortcutGame .asg-char-btn {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  height: 88px !important;
+  min-height: 88px !important;
+  padding: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  transform: none !important;
+  transition: background-color .16s ease,border-color .16s ease,box-shadow .16s ease !important;
+}
+#affinityShortcutGame .asg-char-btn img {
+  display: block !important;
+  width: 76px !important;
+  height: 76px !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  flex-shrink: 0 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+#affinityShortcutGame .asg-char-btn:hover:not(:disabled),
+#affinityShortcutGame .asg-char-btn:active:not(:disabled),
+#affinityShortcutGame .asg-char-btn.selected,
+#affinityShortcutGame .asg-char-btn.selected:hover:not(:disabled) {
+  transform: none !important;
+}
+/* Typing only uses character art on falling cards, not oversized mid-screen pops. */
+#affinityShortcutGame .asg-game-area .asg-character-pop { display: none !important; }
+@media (max-width: 1100px) {
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns: repeat(6,minmax(0,1fr)) !important;
+  }
+  #affinityShortcutGame .asg-char-btn img {
+    width: 78px !important;
+    height: 78px !important;
+  }
+}
+/* Mirror the typing game's 6-to-4 column change at 560px, not 860px. */
+@media (max-width: 560px) {
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    min-height: 0 !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #affinityShortcutGame .asg-char-btn {transition:none !important;}
+}
+</style>
+
 </head>
 <body data-asg-build="AU-ASG-20260824-03">
 <div id="affinityShortcutGame" class="asg-ready" data-license-owner="AFFINITY-UNIVERSE" data-build-id="AU-ASG-20260824-03" data-build-fingerprint="771FF5FF8AD52CA7" data-distribution="protected">
@@ -5742,12 +5805,19 @@ body {
       btn.title = character.name;
       btn.setAttribute('aria-label', character.name + ' 캐릭터 선택');
       btn.innerHTML = characterMarkup(character);
+      btn.setAttribute('aria-pressed', character.id === state.selectedCharacterId ? 'true' : 'false');
       btn.onclick = function () {
         if (state.running) return;
         unlockAudio();
         soundButtonClick();
         state.selectedCharacterId = character.id;
-        renderCharacterGrid();
+        // Preserve the existing 12 image nodes. Rebuilding the grid here caused
+        // visible image loading flicker/size changes during character selection.
+        characterGridEl.querySelectorAll('.asg-char-btn').forEach(function (choice) {
+          const selected = Number(choice.dataset.id) === state.selectedCharacterId;
+          choice.classList.toggle('selected', selected);
+          choice.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        });
       };
       characterGridEl.appendChild(btn);
     });
@@ -5762,22 +5832,8 @@ body {
   }
 
   function showCharacterBurst(kind, x, y, count) {
-    const baseX = x || area.clientWidth / 2;
-    const baseY = y || area.clientHeight * 0.46;
-    const total = count || (kind === 'great' ? 1 : kind === 'combo' ? 3 : 4);
-    for (let i = 0; i < total; i++) {
-      const pop = document.createElement('div');
-      pop.className = 'asg-character-pop ' + kind;
-      const char = i === 0 ? getSelectedCharacter() : getRandomCharacter();
-      pop.innerHTML = `<img src="${char.src}" alt="${char.name}">`;
-      pop.style.left = (baseX + randomBetween(-60, 60)) + 'px';
-      pop.style.top = (baseY + randomBetween(-35, 35)) + 'px';
-      pop.style.setProperty('--ctx', randomBetween(-140, 140) + 'px');
-      pop.style.setProperty('--cty', (-130 - Math.random() * 80) + 'px');
-      pop.style.setProperty('--crot', randomBetween(-22, 22) + 'deg');
-      area.appendChild(pop);
-      window.setTimeout(function () { pop.remove(); }, 1020);
-    }
+    // Typing-game parity: characters stay attached to falling cards.
+    // No transient center-screen character zooms at level/mission/boss cues.
   }
 
   function startBossRound(level, options) {
@@ -6913,5 +6969,512 @@ body {
 
 
 
+<style id="auUnifiedTopLayoutExactV3">
+/* Shared layout contract for Korean Shortcut + Typing.
+   Both HTML pages contain the very same CSS block: dimensions and breakpoints
+   are intentionally identical, regardless of language/tool-specific controls. */
+html,body { margin:0 !important; padding:0 !important; overflow-x:hidden !important; }
+body { display:block !important; min-height:100vh !important; background:#0b1328 !important; }
+#app.app,
+#affinityShortcutGame .asg-wrap {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:clamp(12px,1.55vw,28px) !important;
+  border-radius:0 !important;
+  border:0 !important;
+}
+#affinityShortcutGame { width:100% !important; max-width:none !important; margin:0 !important; }
+
+/* The shared 2-column grid prevents title length changing scoreboard width. */
+#app .header,
+#affinityShortcutGame .asg-header {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 734px !important;
+  align-items:center !important;
+  column-gap:24px !important;
+  row-gap:14px !important;
+  width:100% !important;
+  height:116px !important;
+  min-height:116px !important;
+  margin:0 0 14px !important;
+  padding:0 !important;
+}
+#app .header > div:first-child,
+#affinityShortcutGame .asg-header > div:first-child {
+  display:block !important;
+  align-self:center !important;
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:116px !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:visible !important;
+}
+#app .kicker,
+#affinityShortcutGame .asg-kicker {
+  display:block !important;
+  width:max-content !important;
+  max-width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  margin:0 0 10px !important;
+  font-size:10px !important;
+  line-height:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.15em !important;
+  color:#72a9ff !important;
+}
+#app .header h1,
+#affinityShortcutGame .asg-header h2 {
+  display:block !important;
+  width:100% !important;
+  margin:0 !important;
+  font-size:clamp(32px,3.7vw,50px) !important;
+  line-height:1.04 !important;
+  letter-spacing:-.04em !important;
+  font-weight:760 !important;
+  white-space:nowrap !important;
+}
+#app .header p,
+#affinityShortcutGame .asg-header p {
+  display:block !important;
+  width:100% !important;
+  margin:10px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.55 !important;
+  font-weight:500 !important;
+  color:#cbd6ea !important;
+}
+#app .stats,
+#affinityShortcutGame .asg-stats {
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  column-gap:8px !important;
+  row-gap:8px !important;
+  justify-self:end !important;
+  align-self:center !important;
+  width:734px !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:70px !important;
+  margin:0 !important;
+}
+#app .stat,
+#affinityShortcutGame .asg-stat {
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:70px !important;
+  min-height:70px !important;
+  padding:10px 9px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+  text-align:center !important;
+}
+#app .stat span,
+#affinityShortcutGame .asg-stat span {
+  display:block !important;
+  flex:0 0 auto !important;
+  height:13px !important;
+  margin:0 0 5px !important;
+  color:#91a1bd !important;
+  font-size:11px !important;
+  line-height:13px !important;
+  letter-spacing:.01em !important;
+  font-weight:650 !important;
+}
+#app .stat strong,
+#affinityShortcutGame .asg-stat strong {
+  display:flex !important;
+  flex:0 0 auto !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:26px !important;
+  min-width:0 !important;
+  margin:0 !important;
+  font-size:24px !important;
+  line-height:26px !important;
+  letter-spacing:-.035em !important;
+  font-weight:760 !important;
+  white-space:nowrap !important;
+  color:#fff !important;
+}
+#app .stat strong.hearts,
+#affinityShortcutGame .asg-heart-stat strong {
+  font-size:24px !important;
+  line-height:26px !important;
+  letter-spacing:-1px !important;
+  gap:0 !important;
+  white-space:nowrap !important;
+}
+#affinityShortcutGame .asg-heart-stat i { font-size:24px !important; line-height:26px !important; }
+
+/* Shared toolbar dimensions; controls remain function-specific. */
+#app .toolbar,
+#affinityShortcutGame .asg-toolbar {
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+  width:100% !important;
+  gap:8px !important;
+  margin:0 0 12px !important;
+  padding:0 !important;
+}
+#app .toolbar > .btn,
+#affinityShortcutGame .asg-toolbar > button {
+  box-sizing:border-box !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex:0 0 auto !important;
+  height:42px !important;
+  min-height:42px !important;
+  padding:0 16px !important;
+  margin:0 !important;
+  border-radius:11px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(17,32,61,.90) !important;
+  color:#cbd6ea !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  box-shadow:none !important;
+}
+#app .toolbar > .btn.primary,
+#affinityShortcutGame .asg-toolbar > #asgStartBtn {
+  background:#0068ff !important;
+  color:#fff !important;
+  box-shadow:0 8px 20px rgba(0,104,255,.22) !important;
+}
+#app .toolbar > .btn.resume-active,
+#affinityShortcutGame .asg-toolbar > #asgPauseBtn.asg-active {
+  background:#ff7a21 !important;
+  color:#fff !important;
+}
+
+/* Form rows use exactly the same 4 column tracks and 91px cards. */
+#app .setup,
+#affinityShortcutGame .asg-setup-panel {
+  box-sizing:border-box !important;
+  width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+#app .setup { margin:0 0 10px !important; }
+#affinityShortcutGame .asg-setup-panel {
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+  margin:0 0 12px !important;
+}
+#app .setup-grid,
+#affinityShortcutGame .asg-setup-row {
+  display:grid !important;
+  grid-template-columns:1fr .72fr .92fr minmax(220px,1.05fr) !important;
+  align-items:stretch !important;
+  width:100% !important;
+  min-height:91px !important;
+  gap:9px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+#app .setup-grid > .field,
+#affinityShortcutGame .asg-setup-row > .asg-field,
+#affinityShortcutGame .asg-setup-row > .asg-mini-card {
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  width:100% !important;
+  min-height:91px !important;
+  height:91px !important;
+  padding:12px 13px !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+  box-shadow:none !important;
+}
+#app .setup-grid > .field { display:flex !important; flex-direction:column !important; gap:8px !important; }
+#affinityShortcutGame .asg-setup-row > .asg-field { display:flex !important; flex-direction:column !important; gap:8px !important; }
+#app .field label,
+#affinityShortcutGame .asg-field > span {
+  display:block !important;
+  flex:0 0 15px !important;
+  height:15px !important;
+  line-height:15px !important;
+  margin:0 !important;
+  padding:0 !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  color:#fff !important;
+}
+#app .field input,
+#app .field select,
+#affinityShortcutGame .asg-field input,
+#affinityShortcutGame .asg-field select {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:100% !important;
+  min-height:42px !important;
+  height:42px !important;
+  margin:0 !important;
+  padding:0 11px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+  background:rgba(5,27,64,.46) !important;
+  color:#fff !important;
+  font-size:13px !important;
+  font-weight:650 !important;
+}
+#affinityShortcutGame .asg-setup-row > .asg-mini-card {justify-content:center !important; gap:4px !important;}
+#affinityShortcutGame .asg-mini-card strong,
+#affinityShortcutGame .asg-mini-card span,
+#affinityShortcutGame .asg-mini-card small { display:block !important; flex:0 0 auto !important; margin:0 !important; }
+
+/* Same 142px character panel, 12 cards and stable artwork. */
+#app .character-panel,
+#affinityShortcutGame .asg-character-panel {
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:142px !important;
+  min-height:142px !important;
+  padding:12px !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(14,26,50,.82) !important;
+}
+#app .character-panel {margin:0 0 12px !important;}
+#affinityShortcutGame .asg-character-head,
+#app .character-title {
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:15px !important;
+  margin:0 0 9px !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  line-height:15px !important;
+}
+#app .characters,
+#affinityShortcutGame .asg-character-grid {
+  display:grid !important;
+  grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  align-items:stretch !important;
+  width:100% !important;
+  height:92px !important;
+  min-height:92px !important;
+  gap:7px !important;
+}
+#app .char,
+#affinityShortcutGame .asg-char-btn {
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:88px !important;
+  min-height:88px !important;
+  padding:5px !important;
+  margin:0 !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(5,27,64,.34) !important;
+  box-shadow:none !important;
+}
+#app .char.selected,
+#affinityShortcutGame .asg-char-btn.selected {
+  background:rgba(0,104,255,.18) !important;
+  border-color:rgba(0,104,255,.52) !important;
+  box-shadow:inset 0 0 0 3px rgba(0,104,255,.08) !important;
+  transform:none !important;
+}
+#app .char img,
+#affinityShortcutGame .asg-char-btn img {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:76px !important;
+  height:76px !important;
+  max-width:calc(100% - 2px) !important;
+  max-height:76px !important;
+  flex:0 1 auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  transform:none !important;
+  animation:none !important;
+  transition:none !important;
+}
+#affinityShortcutGame .asg-char-btn:hover:not(:disabled),
+#affinityShortcutGame .asg-char-btn:active:not(:disabled) {transform:none !important;}
+
+/* The level/progress bar starts on the same exact line in both games. */
+#app .levelbar,
+#affinityShortcutGame .asg-level-panel {
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:minmax(190px,.55fr) minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:12px !important;
+  width:100% !important;
+  min-height:61px !important;
+  height:61px !important;
+  margin:0 0 10px !important;
+  padding:11px 13px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  border-radius:14px !important;
+  background:rgba(14,26,50,.82) !important;
+}
+#app .levelbar h3,
+#affinityShortcutGame .asg-level-panel > div:first-child > strong {
+  display:block !important;
+  margin:0 0 4px !important;
+  font-size:16px !important;
+  line-height:19px !important;
+  font-weight:700 !important;
+}
+#app .levelbar p,
+#affinityShortcutGame .asg-level-panel > div:first-child > span {
+  display:block !important;
+  margin:0 !important;
+  font-size:13px !important;
+  line-height:16px !important;
+  color:#91a1bd !important;
+}
+#app .progress-meta,
+#affinityShortcutGame .asg-progress-info {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  margin:0 0 7px !important;
+  padding:0 !important;
+  font-size:13px !important;
+  line-height:16px !important;
+  color:#91a1bd !important;
+}
+#app .progress,
+#affinityShortcutGame .asg-progress-bar {
+  box-sizing:border-box !important;
+  display:block !important;
+  width:100% !important;
+  height:9px !important;
+  min-height:9px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(5,27,64,.46) !important;
+}
+
+
+/* Buttons are pixel-identical in both pages, even with different inherited fonts. */
+#app .toolbar > button:nth-child(1),
+#affinityShortcutGame .asg-toolbar > button:nth-child(1) {width:94px !important;}
+#app .toolbar > button:nth-child(2),
+#affinityShortcutGame .asg-toolbar > button:nth-child(2) {width:96px !important;}
+#app .toolbar > button:nth-child(3),
+#affinityShortcutGame .asg-toolbar > button:nth-child(3) {width:99px !important;}
+#app .toolbar > button:nth-child(4),
+#affinityShortcutGame .asg-toolbar > button:nth-child(4) {width:173px !important;}
+/* The idle game zone also matches across narrow layouts. Playing-state viewport
+   rules deliberately remain under each game's original control. */
+#app:not(.typing-in-game) .game,
+#affinityShortcutGame.asg-ready .asg-game-area {
+  box-sizing:border-box !important;
+  flex:0 0 520px !important;
+  height:520px !important;
+  min-height:520px !important;
+  max-height:none !important;
+}
+
+/* Responsive grids are identical; no 2-vs-1-column jump at 860px. */
+@media(max-width:1260px) {
+  #app .header,
+  #affinityShortcutGame .asg-header {
+    height:auto !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    row-gap:14px !important;
+    align-items:start !important;
+  }
+  #app .header > div:first-child,
+  #affinityShortcutGame .asg-header > div:first-child { height:auto !important; min-height:0 !important; }
+  #app .stats,
+  #affinityShortcutGame .asg-stats { width:100% !important; max-width:none !important; justify-self:stretch !important; }
+}
+@media(max-width:1100px) {
+  #app .setup-grid,
+  #affinityShortcutGame .asg-setup-row { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #app .characters,
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    height:183px !important;
+    min-height:183px !important;
+  }
+  #app .character-panel,
+  #affinityShortcutGame .asg-character-panel {height:233px !important; min-height:233px !important;}
+}
+@media(max-width:700px) {
+  #app .setup-grid,
+  #affinityShortcutGame .asg-setup-row { grid-template-columns:1fr !important; }
+  #app .levelbar,
+  #affinityShortcutGame .asg-level-panel {
+    grid-template-columns:minmax(0,1fr) !important;
+    height:104px !important;
+    min-height:104px !important;
+    gap:9px !important;
+  }
+  #app .header h1,
+  #affinityShortcutGame .asg-header h2 {
+    font-size:clamp(29px,7.2vw,40px) !important;
+    white-space:normal !important;
+    word-break:keep-all !important;
+  }
+  #app .header p,
+  #affinityShortcutGame .asg-header p {font-size:13px !important;line-height:1.5 !important;}
+  #app .toolbar > .btn,
+  #affinityShortcutGame .asg-toolbar > button {padding:0 12px !important;font-size:12px !important;}
+}
+@media(max-width:680px) {
+  #app .stats,
+  #affinityShortcutGame .asg-stats {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    height:148px !important;
+  }
+}
+@media(max-width:560px) {
+  #app .characters,
+  #affinityShortcutGame .asg-character-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    height:278px !important;
+    min-height:278px !important;
+  }
+  #app .character-panel,
+  #affinityShortcutGame .asg-character-panel {height:328px !important;min-height:328px !important;}
+  #app .char img,
+  #affinityShortcutGame .asg-char-btn img {
+    width:76px !important;
+    max-width:calc(100% - 2px) !important;
+    height:76px !important;
+  }
+  #app .stat strong.hearts,
+  #affinityShortcutGame .asg-heart-stat strong {font-size:21px !important;}
+  #affinityShortcutGame .asg-heart-stat i {font-size:21px !important;}
+}
+@media(prefers-reduced-motion:reduce) {
+  #app .char img,
+  #affinityShortcutGame .asg-char-btn img {transition:none !important;}
+}
+</style>
 </body>
 </html>
