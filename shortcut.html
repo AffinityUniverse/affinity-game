@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<!-- Cross-device game feedback font: same published face for desktop and mobile. -->
+<link rel="preconnect" href="https://fontzip.co.kr" crossorigin>
+<link rel="stylesheet" href="https://fontzip.co.kr/webfonts/pinkfong-baby-shark-bold.css">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Affinity Universe">
@@ -11,7 +15,6 @@
 /* ASG_VERSION_V021_MISSION_COMPLETE_AUDIO_EXACT: user provided mission complete mp3 */
   /* 최신 업데이트 V021: 미션 컴플리트 음성 지정 파일로 교체 */
   /* 최신 업데이트 V012: 클릭/터치/포인터 버튼 처리 + 게임스타트/삐이이/스피드업/게임오버 순서 고정 */
-  @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
   @font-face {
     font-family: "Pinkfong Baby Shark";
@@ -34,13 +37,13 @@
     --asg-card-text: #171b2e;
     width: 100%;
     color: #fff;
-    font-family: "Pinkfong Baby Shark", "Jua", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif !important;
+    font-family: "Pinkfong Baby Shark",  Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif !important;
     box-sizing: border-box;
   }
 
   #affinityShortcutGame * {
     box-sizing: border-box;
-    font-family: "Pinkfong Baby Shark", "Jua", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif !important;
+    font-family: "Pinkfong Baby Shark",  Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif !important;
   }
 
   #affinityShortcutGame .asg-wrap {
@@ -4018,7 +4021,7 @@ body {
   border:0 !important;
   box-shadow:none !important;
   color:#fff !important;
-  font-family:"Pinkfong Baby Shark","Jua",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
+  font-family:"Pinkfong Baby Shark",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
   font-size:clamp(34px,8vw,82px) !important;
   font-weight:1000 !important;
   line-height:1.08 !important;
@@ -4148,7 +4151,7 @@ body {
   border:0 !important;
   background:transparent !important;
   box-shadow:none !important;
-  font-family:"Pinkfong Baby Shark","Jua",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
+  font-family:"Pinkfong Baby Shark",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
   font-size:clamp(34px,8vw,82px) !important;
   font-weight:1000 !important;
   line-height:normal !important;
@@ -4200,7 +4203,7 @@ body {
 }
 #affinityShortcutGame .asg-game-area .asg-typing-gameover > strong {
   display:inline-block !important;
-  font-family:"Pinkfong Baby Shark","Jua",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
+  font-family:"Pinkfong Baby Shark",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
   font-size:clamp(34px,8vw,82px) !important;
   font-weight:1000 !important;
   line-height:1.08 !important;
@@ -4440,6 +4443,13 @@ body {
         입력한 키:
         <strong id="asgLastKey">-</strong>
       </div>
+    </div>
+
+
+    <div class="asg-touch-keyboard" id="asgTouchKeyboard" aria-label="모바일 단축키 키보드">
+      <div class="asg-touch-header"><strong>터치 단축키 키보드</strong><span id="asgTouchCurrent" aria-live="polite">키를 누르세요</span></div>
+      <div class="asg-touch-mods"><button type="button" data-mod="ctrl" aria-pressed="false">Ctrl / Cmd</button><button type="button" data-mod="shift" aria-pressed="false">Shift</button><button type="button" data-action="send">조합 입력</button></div>
+      <div class="asg-touch-keys"></div><div class="asg-touch-special"></div>
     </div>
 
     <div class="asg-bottom-panels">
@@ -5132,6 +5142,7 @@ body {
   }
 
   function requestKeyboardFocusLock() {
+    if(isTouchShortcutMode()){state.keyboardLockActive=false;return;}
     state.keyboardLockTried = true;
     try { root.focus({ preventScroll: true }); } catch (err) {}
     try { area.focus({ preventScroll: true }); } catch (err) { try { area.focus(); } catch (e) {} }
@@ -5212,6 +5223,7 @@ body {
   }
 
   function toggleFullscreenMode() {
+    if(isTouchShortcutMode())return;
     if (isFullscreenActive()) exitGameFullscreen();
     else enterGameFullscreen();
   }
@@ -5448,14 +5460,14 @@ body {
       pool = categoryPool.length ? categoryPool : SHORTCUTS.filter((item) => getShortcutCategory(item) === state.category);
     }
 
-    if (!isFullscreenActive()) {
+    if (!isFullscreenActive() && !isTouchShortcutMode()) {
       const saferPool = pool.filter(function (item) { return !isFullscreenOnlyShortcut(item); });
       if (saferPool.length) pool = saferPool;
     }
 
     if (!pool.length) {
       pool = SHORTCUTS.slice();
-      if (!isFullscreenActive()) pool = pool.filter(function (item) { return !isFullscreenOnlyShortcut(item); });
+      if (!isFullscreenActive() && !isTouchShortcutMode()) pool = pool.filter(function (item) { return !isFullscreenOnlyShortcut(item); });
     }
     return pool.length ? pool : SHORTCUTS.slice();
   }
@@ -5469,14 +5481,17 @@ body {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  function getDifficultyConfig() { return DIFFICULTY[state.difficulty] || DIFFICULTY.easy; }
+  function getDifficultyConfig() {
+    const c=DIFFICULTY[state.difficulty] || DIFFICULTY.easy;
+    return isTouchShortcutMode()?{...c,baseMinSpeed:c.baseMinSpeed*.36,baseMaxSpeed:c.baseMaxSpeed*.36,spawnEvery:c.spawnEvery*1.9,spawnReduce:c.spawnReduce*.5}:c;
+  }
   function getLevelSpeedMultiplier() { return Math.pow(LEVEL_SPEED_MULTIPLIER, state.level - 1); }
   function getCurrentSpawnEvery() {
     const config = getDifficultyConfig();
     const levelReduction = (state.level - 1) * config.spawnReduce;
     let next = Math.max(0.58, config.spawnEvery - levelReduction);
     if (state.bossRound && state.bossRound.active) next = Math.max(0.38, next * 0.72);
-    return next;
+    return isTouchShortcutMode() ? Math.max(1.55,next) : next;
   }
 
   function normalizeKeyEvent(e) {
@@ -5960,6 +5975,7 @@ body {
     overlay.setAttribute('aria-label','게임 종료');
     const title = document.createElement('strong');
     title.textContent = 'GAME OVER';
+    if(window.auApplyCueVector)window.auApplyCueVector(title,'GAME OVER');
     const description = document.createElement('span');
     const name = (playerNameInput && playerNameInput.value.trim()) || 'Player';
     description.textContent = name + ' · ' + state.score + '점 · LEVEL ' + state.level;
@@ -5968,11 +5984,17 @@ body {
   }
 
   function spawnCard() {
+    if(isTouchShortcutMode() && state.cards.filter(c=>!c.dead).length>=2)return;
     const data = pickShortcut();
     const areaRect = area.getBoundingClientRect();
-    const cardWidth = areaRect.width < 620 ? 220 : areaRect.width < 1100 ? 245 : 280;
-    const x = randomBetween(18, Math.max(30, area.clientWidth - cardWidth - 18));
-    const y = -150;
+    const cardWidth = isTouchShortcutMode() ? Math.min(156,Math.max(110,areaRect.width-18)) : areaRect.width < 620 ? 220 : areaRect.width < 1100 ? 245 : 280;
+    let x = randomBetween(18, Math.max(30, area.clientWidth - cardWidth - 18));
+    if(isTouchShortcutMode()){
+      const left=10,right=Math.max(left,area.clientWidth-cardWidth-10);
+      const other=state.cards.find(c=>!c.dead);
+      x=other?(other.x<(left+right)/2?right:left):(Math.random()<.5?left:right);
+    }
+    const y = isTouchShortcutMode() ? -48 : -150;
     const config = getDifficultyConfig();
     const levelMultiplier = getLevelSpeedMultiplier();
     const speed = randomBetween(config.baseMinSpeed, config.baseMaxSpeed) * levelMultiplier;
@@ -5985,14 +6007,21 @@ body {
       <div class="asg-card-name">${data.name}</div>
     `;
     area.appendChild(el);
-    const card = { id: ++state.cardId, el, x, y, width: cardWidth, speed, combos: data.combos, label: data.label, name: data.name, dead: false, danger: false };
+    const card = { id: ++state.cardId, el, x, y, width: cardWidth, speed, combos: data.combos, label: data.label, name: data.name, dead: false, danger: false, revealAt: isTouchShortcutMode() ? performance.now() : null };
     state.cards.push(card);
     renderCard(card);
   }
 
   function renderCard(card) {
-    // Only the composited transform changes on every animation frame.
+    // Position always advances at the SAME speed: mobile entrance fades into view,
+    // without applying a faster entry velocity or jumping the initial position.
     card.el.style.transform = `translate3d(${card.x}px, ${card.y}px, 0)`;
+    if (card.revealAt !== null && card.revealAt !== undefined && !card.dead) {
+      const phase = Math.min(1, Math.max(0, (performance.now() - card.revealAt) / 1350));
+      const smooth = phase * phase * (3 - 2 * phase);
+      if (phase >= 1) { card.revealAt = null; card.el.style.removeProperty('opacity'); }
+      else card.el.style.opacity = String(smooth);
+    }
   }
 
   function setCardEffectPosition(card) {
@@ -6003,11 +6032,11 @@ body {
 
 
   function clampActiveCardsToArea() {
-    const maxWidth = Math.max(220, area.clientWidth || 0);
+    const maxWidth = Math.max(1, area.clientWidth || 0);
     state.cards.forEach(function (card) {
       if (!card || card.dead) return;
-      const width = card.width || 240;
-      card.x = Math.max(12, Math.min(card.x, maxWidth - width - 12));
+      const width = card.el ? card.el.getBoundingClientRect().width : (card.width||240);
+      card.x = Math.max(5, Math.min(card.x, maxWidth - width - 5));
       renderCard(card);
     });
   }
@@ -6143,7 +6172,7 @@ body {
       return;
     }
     area.querySelectorAll('.asg-floating-word:not(.asg-reference-praise)').forEach(el=>el.remove());
-    const word=document.createElement('div');word.className='asg-floating-word'+(type?' '+type:'');word.textContent=text;area.appendChild(word);
+    const word=document.createElement('div');word.className='asg-floating-word'+(type?' '+type:'');word.textContent=text;if(window.auApplyCueVector)window.auApplyCueVector(word,text);area.appendChild(word);
     setTimeout(()=>word.remove(),type==='speed-up'?1120:type==='game-over-word'?3900:760);
   }
 
@@ -6412,15 +6441,17 @@ body {
       }
 
       const areaHeight = area.clientHeight;
-      const dangerLine = areaHeight - 300;
+      const dangerLine = isTouchShortcutMode()?Math.max(58,areaHeight-175):areaHeight-300;
       state.cards.slice().forEach(function (card) {
+        // Mobile and desktop: one continuous velocity per card from first frame to last.
+        // No fast-entry phase or speed switch at the top of the screen.
         card.y += card.speed * dt;
         if (!card.danger && card.y > dangerLine) {
           card.danger = true;
           if (card.el) card.el.classList.add("danger");
         }
         renderCard(card);
-        if (card.y > areaHeight - 145) missCard(card);
+        if (card.y > areaHeight - (isTouchShortcutMode()?76:145)) missCard(card);
       });
     }
 
@@ -6500,6 +6531,7 @@ body {
     unlockAudio();
     root.classList.remove("asg-ready", "asg-ended");
     root.classList.add("asg-playing");
+    if(isTouchShortcutMode()){try{window.scrollTo(0,0)}catch(_){}}
     clearTransientEffects();
     hideFinalNextGamesV11();
     state.playerName = (playerNameInput && playerNameInput.value.trim()) ? playerNameInput.value.trim() : 'Player';
@@ -6730,14 +6762,8 @@ body {
     const target = event.target && event.target.closest ? event.target.closest("button") : null;
     if (!target || !root.contains(target)) return;
 
-    const now = Date.now();
-    if (now - lastToolbarActionAt < 180) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
-      return false;
-    }
-
+    // Only throttle actual toolbar buttons. Virtual keyboard taps must never
+    // be canceled by the start button's 180ms de-bounce window.
     let action = null;
     if (target.id === "asgStartBtn") action = startGame;
     else if (target.id === "asgPauseBtn") action = pauseGame;
@@ -6748,6 +6774,13 @@ body {
        renderCharacter() and triggered the generic error message before game start. */
 
     if (!action || target.disabled) return;
+    const now = Date.now();
+    if (now - lastToolbarActionAt < 180) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+      return false;
+    }
     lastToolbarActionAt = now;
     event.preventDefault();
     event.stopPropagation();
@@ -6947,6 +6980,62 @@ body {
   if (meteorField && window.getComputedStyle(meteorField).display !== 'none') {
     scheduleNextMeteor();
   }
+
+
+  /* Mobile: genuine shortcut combinations through a compact on-screen keyboard.
+     Physical keyboard handling on desktop remains untouched. */
+  const asgTouchBoard = root.querySelector('#asgTouchKeyboard');
+  let touchCtrl = false, touchShift = false;
+  function isTouchShortcutMode(){
+    return window.innerWidth <= 820 || (!!window.matchMedia && window.matchMedia('(pointer:coarse)').matches && window.innerWidth <= 1180);
+  }
+  function syncMobileViewport(){
+    const h = Math.max(300, Math.round(window.visualViewport ? window.visualViewport.height : window.innerHeight));
+    document.documentElement.style.setProperty('--au-mobile-vh',h+'px');
+  }
+  function updateTouchModifierState(){
+    if (!asgTouchBoard) return;
+    asgTouchBoard.querySelectorAll('[data-mod]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mod==='ctrl'?String(touchCtrl):String(touchShift)));
+    const indicator=asgTouchBoard.querySelector('#asgTouchCurrent');
+    if(indicator) indicator.textContent=(touchCtrl?'Ctrl/Cmd + ':'')+(touchShift?'Shift + ':'')+'키를 누르세요';
+  }
+  if (asgTouchBoard) {
+    const letters='A B C D G I J N O P S T U V X Y Z'.split(' ');
+    const specials=[['←','left'],['→','right'],['↑','up'],['↓','down'],['⌫','backspace'],['␣','space'],['[','['],[']',']'],['/','/']];
+    const letterGrid=asgTouchBoard.querySelector('.asg-touch-keys');
+    const specialGrid=asgTouchBoard.querySelector('.asg-touch-special');
+    letters.forEach(k=>{
+      const b=document.createElement('button');b.type='button';b.textContent=k;b.dataset.key=k.toLowerCase();b.setAttribute('aria-label',k+' 키 입력');letterGrid.appendChild(b);
+    });
+    // The second letter row has eight letters: Enter occupies its ninth cell.
+    const enterKey=document.createElement('button');
+    enterKey.type='button';enterKey.textContent='↵';enterKey.dataset.key='enter';
+    enterKey.setAttribute('aria-label','Enter 키 입력');
+    letterGrid.appendChild(enterKey);
+    specials.forEach(([caption,value])=>{
+      const b=document.createElement('button');b.type='button';b.textContent=caption;b.dataset.key=value;b.setAttribute('aria-label',value+' 키 입력');specialGrid.appendChild(b);
+    });
+    asgTouchBoard.addEventListener('click',e=>{
+      const button=e.target.closest('button');
+      if(!button||!asgTouchBoard.contains(button))return;
+      e.preventDefault();
+      if(!state.running||state.paused)return;
+      if(button.dataset.mod==='ctrl')touchCtrl=!touchCtrl;
+      else if(button.dataset.mod==='shift')touchShift=!touchShift;
+      else {
+        const value=button.dataset.key||'';
+        const key=value || (touchCtrl&&touchShift?'ctrl+shift':touchCtrl?'ctrl':touchShift?'shift':'');
+        const combo=value?((touchCtrl?'ctrl+':'')+(touchShift?'shift+':'')+value):key;
+        if(combo)judgeGameCombo(combo);
+        touchCtrl=false;touchShift=false;
+      }
+      updateTouchModifierState();
+    },{signal:asgController.signal});
+    updateTouchModifierState();
+  }
+  if(window.visualViewport){window.visualViewport.addEventListener('resize',syncMobileViewport,{signal:asgController.signal});}
+  window.addEventListener('resize',syncMobileViewport,{signal:asgController.signal});
+  syncMobileViewport();
 
   state.shortcutPool = getShortcutPoolByDifficulty(state.difficulty);
   resetMission();
@@ -7474,6 +7563,547 @@ body { display:block !important; min-height:100vh !important; background:#0b1328
 @media(prefers-reduced-motion:reduce) {
   #app .char img,
   #affinityShortcutGame .asg-char-btn img {transition:none !important;}
+}
+</style>
+
+<style id="auMobileShortcutPlayableV1">
+/* Mobile-first touch play, without changing desktop layout. */
+#affinityShortcutGame .asg-touch-keyboard {display:none;}
+@media (max-width: 820px) {
+  body {padding:0 !important; overflow-x:hidden !important;}
+  #affinityShortcutGame .asg-wrap {
+    padding:12px 11px 16px !important;
+    min-height:100dvh !important; overflow:visible !important;
+  }
+  #affinityShortcutGame .asg-header {
+    display:flex !important;flex-direction:column !important;
+    align-items:stretch !important;height:auto !important;min-height:0 !important;
+    gap:9px !important;margin-bottom:9px !important;
+  }
+  #affinityShortcutGame .asg-header > div:first-child {height:auto !important;}
+  #affinityShortcutGame .asg-kicker {font-size:9px !important; margin:0 0 7px !important;}
+  #affinityShortcutGame .asg-header h2 {font-size:clamp(25px,7.5vw,36px) !important;line-height:1.1 !important;white-space:normal !important;}
+  #affinityShortcutGame .asg-header p {font-size:12px !important;line-height:1.4 !important;margin:7px 0 0 !important;}
+  #affinityShortcutGame .asg-stats {
+    display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:5px !important;width:100% !important;max-width:100% !important;
+    height:62px !important;min-height:62px !important; margin:0 !important;
+  }
+  #affinityShortcutGame .asg-stat {
+    height:62px !important;min-height:62px !important;padding:5px 2px !important;
+    border-radius:11px !important;
+  }
+  #affinityShortcutGame .asg-stat span {font-size:10px !important;margin:0 0 3px !important;height:auto !important;}
+  #affinityShortcutGame .asg-stat strong {font-size:20px !important;line-height:23px !important;height:23px !important;}
+  #affinityShortcutGame .asg-heart-stat strong {gap:0 !important;white-space:nowrap !important;}
+  #affinityShortcutGame .asg-heart-stat i {font-size:clamp(11px,3.4vw,17px) !important;line-height:22px !important;}
+  #affinityShortcutGame .asg-toolbar {
+    display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:7px !important; margin-bottom:10px !important;
+  }
+  #affinityShortcutGame .asg-toolbar > button {
+    width:100% !important; min-width:0 !important; height:40px !important; min-height:40px !important;
+    padding:0 7px !important;font-size:12px !important;border-radius:10px !important;
+  }
+  #affinityShortcutGame .asg-toolbar > button:nth-child(n) {width:100% !important;}
+  #affinityShortcutGame .asg-setup-panel {gap:9px !important;margin-bottom:10px !important;}
+  #affinityShortcutGame .asg-setup-row {
+    display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:7px !important;min-height:0 !important;
+  }
+  #affinityShortcutGame .asg-setup-row > .asg-field,
+  #affinityShortcutGame .asg-setup-row > .asg-mini-card {
+    height:86px !important; min-height:86px !important; padding:9px !important;
+    border-radius:12px !important;
+  }
+  #affinityShortcutGame .asg-field > span {font-size:11px !important;line-height:15px !important;}
+  #affinityShortcutGame .asg-field input,
+  #affinityShortcutGame .asg-field select {
+    font-size:12px !important;height:42px !important;min-height:42px !important;
+    padding:0 9px !important;
+  }
+  #affinityShortcutGame .asg-mini-card strong {font-size:11px !important;}
+  #affinityShortcutGame .asg-mini-card span {font-size:11px !important;line-height:1.25 !important;}
+  #affinityShortcutGame .asg-mini-card small {font-size:11px !important;}
+  /* Swipe the character row instead of expanding to three tall rows. */
+  #affinityShortcutGame .asg-character-panel {height:120px !important;min-height:120px !important;padding:10px !important;overflow:hidden !important;}
+  #affinityShortcutGame .asg-character-head {height:15px !important;margin:0 0 7px !important;}
+  #affinityShortcutGame .asg-character-grid {
+    display:flex !important;flex-wrap:nowrap !important;align-items:center !important;
+    gap:7px !important; height:78px !important;min-height:78px !important;
+    width:100% !important; overflow-x:auto !important;overflow-y:hidden !important;
+    scroll-snap-type:x proximity;overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch; padding:0 1px 5px !important;
+  }
+  #affinityShortcutGame .asg-char-btn {
+    flex:0 0 67px !important;width:67px !important;min-width:67px !important;
+    height:72px !important; min-height:72px !important; padding:4px !important;
+    scroll-snap-align:start;border-radius:11px !important;
+  }
+  #affinityShortcutGame .asg-char-btn img {width:auto !important;height:62px !important;max-width:59px !important;max-height:62px !important;object-fit:contain !important;}
+  #affinityShortcutGame .asg-level-panel {
+    grid-template-columns:minmax(0,1fr) !important;height:82px !important;min-height:82px !important;
+    gap:6px !important;margin-bottom:9px !important;padding:9px 11px !important;
+  }
+  #affinityShortcutGame .asg-level-panel > div:first-child > strong {font-size:14px !important;margin-bottom:2px !important;}
+  #affinityShortcutGame .asg-level-panel > div:first-child > span {font-size:11px !important;}
+  #affinityShortcutGame .asg-progress-info {margin-bottom:4px !important;font-size:11px !important;}
+  #affinityShortcutGame .asg-game-area {
+    width:100% !important; min-height:365px !important; height:365px !important;
+    flex:0 0 365px !important;border-radius:14px !important;
+  }
+  #affinityShortcutGame.asg-ready .asg-game-area {min-height:365px !important;height:365px !important;flex:0 0 365px !important;}
+  #affinityShortcutGame .asg-center-message strong {font-size:clamp(26px,8vw,38px) !important;}
+  #affinityShortcutGame .asg-center-message span {font-size:12px !important;line-height:1.35 !important;}
+  #affinityShortcutGame .asg-center-message small {font-size:10px !important;line-height:1.35 !important;}
+  #affinityShortcutGame .asg-card {
+    width:min(185px,calc(100% - 16px)) !important;min-height:76px !important;
+    padding:7px !important;border-radius:14px !important;
+  }
+  #affinityShortcutGame .asg-card-kbd {min-height:41px !important;padding:4px 6px !important;}
+  #affinityShortcutGame .asg-card-shortcut {font-size:clamp(13px,3.8vw,17px) !important;}
+  #affinityShortcutGame .asg-card-name {font-size:11px !important;margin-top:5px !important;}
+  #affinityShortcutGame .asg-card-helper {top:-52px !important;width:63px !important;height:63px !important;}
+  #affinityShortcutGame .asg-licence-mark {font-size:8px !important;}
+  #affinityShortcutGame.asg-playing .asg-wrap {
+    min-height:0 !important; height:var(--au-mobile-vh,100dvh) !important;
+    max-height:var(--au-mobile-vh,100dvh) !important;
+    display:flex !important;flex-direction:column !important;
+    overflow:hidden !important; padding:8px 9px max(8px,env(safe-area-inset-bottom)) !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-header {
+    display:grid !important;grid-template-columns:minmax(92px,0.8fr) minmax(0,2fr) !important;
+    align-items:center !important;gap:6px !important;height:51px !important;min-height:51px !important;
+    margin:0 0 5px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-kicker,
+  #affinityShortcutGame.asg-playing .asg-header p {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-header h2 {font-size:clamp(16px,4.5vw,21px) !important;line-height:1.13 !important;}
+  #affinityShortcutGame.asg-playing .asg-stats {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:3px !important;height:49px !important;min-height:49px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-stat {
+    height:49px !important;min-height:49px !important;padding:3px 1px !important;border-radius:8px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-stat span {font-size:8px !important;margin:0 0 1px !important;}
+  #affinityShortcutGame.asg-playing .asg-stat strong {font-size:16px !important;height:20px !important;line-height:20px !important;}
+  #affinityShortcutGame.asg-playing .asg-heart-stat i {font-size:clamp(8px,2.2vw,12px) !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar {
+    display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:5px !important;margin:0 0 5px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-toolbar #asgStartBtn {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar > button {height:35px !important;min-height:35px !important;font-size:11px !important;}
+  #affinityShortcutGame.asg-playing .asg-level-panel {
+    grid-template-columns:minmax(0,1fr) minmax(0,.85fr) !important;
+    min-height:42px !important;height:42px !important;margin:0 0 5px !important;
+    padding:5px 8px !important;gap:7px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-level-panel > div:first-child > strong {font-size:13px !important;}
+  #affinityShortcutGame.asg-playing .asg-level-panel > div:first-child > span {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-progress-info {margin:0 0 4px !important;font-size:9px !important;}
+  #affinityShortcutGame.asg-playing .asg-progress-bar {height:6px !important;min-height:6px !important;}
+  #affinityShortcutGame.asg-playing .asg-game-area {
+    flex:1 1 0 !important;min-height:150px !important;height:0 !important;
+    max-height:none !important; overflow:hidden !important; margin-bottom:5px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-last-key {right:8px !important;bottom:9px !important;font-size:10px !important;}
+  #affinityShortcutGame.asg-playing .asg-bottom-line {bottom:43px !important;}
+  #affinityShortcutGame.asg-playing .asg-touch-keyboard {
+    display:flex !important;flex-direction:column !important;gap:4px !important;
+    flex:0 0 auto !important;width:100% !important;
+    padding:8px !important;background:rgba(7,17,37,.98) !important;
+    border:1px solid rgba(103,157,239,.35) !important;
+    border-radius:13px !important;
+    box-shadow:0 -4px 30px rgba(1,12,39,.25) !important;
+  }
+  #affinityShortcutGame .asg-touch-header {display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:16px;}
+  #affinityShortcutGame .asg-touch-header strong {font-size:10px;font-weight:800;color:#b9d2ff;}
+  #affinityShortcutGame .asg-touch-header span {font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#aac9ff;}
+  #affinityShortcutGame .asg-touch-mods {display:grid;grid-template-columns:1.2fr 1fr 1.15fr;gap:5px;}
+  #affinityShortcutGame .asg-touch-keys {display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;}
+  #affinityShortcutGame .asg-touch-special {display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;}
+  #affinityShortcutGame .asg-touch-keyboard button {
+    display:flex !important;align-items:center !important;justify-content:center !important;
+    width:100% !important;min-width:0 !important;min-height:34px !important;height:34px !important;
+    padding:0 2px !important;margin:0 !important;border-radius:7px !important;
+    border:1px solid rgba(129,164,220,.28) !important;
+    background:#1b3155 !important;color:#eef4ff !important;
+    font-size:13px !important;font-weight:800 !important;line-height:1 !important;
+    touch-action:manipulation;user-select:none;-webkit-user-select:none;
+    box-shadow:none !important;transform:none !important;
+  }
+  #affinityShortcutGame .asg-touch-keyboard button[data-mod] {height:35px !important;font-size:12px !important;background:#243d62 !important;}
+  #affinityShortcutGame .asg-touch-keyboard button[aria-pressed="true"] {background:#0064ff !important;border-color:#8cc5ff !important;}
+  #affinityShortcutGame .asg-touch-keyboard button[data-action="send"] {background:#0064ff !important;border-color:#4798ff !important;}
+  #affinityShortcutGame .asg-touch-special button {font-size:11px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button:active:not(:disabled) {filter:brightness(1.25);}
+  #affinityShortcutGame .asg-game-area .asg-lane-label {font-size:9px !important;padding:5px 7px !important;}
+}
+@media (max-width: 820px) and (max-height: 690px) {
+  #affinityShortcutGame.asg-playing .asg-wrap {padding-top:5px !important;padding-bottom:4px !important;}
+  #affinityShortcutGame.asg-playing .asg-header {height:42px !important;min-height:42px !important;margin-bottom:3px !important;}
+  #affinityShortcutGame.asg-playing .asg-stats {height:41px !important;min-height:41px !important;}
+  #affinityShortcutGame.asg-playing .asg-stat {height:41px !important;min-height:41px !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar > button {height:32px !important;min-height:32px !important;}
+  #affinityShortcutGame.asg-playing .asg-level-panel {height:36px !important;min-height:36px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button {height:29px !important;min-height:29px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button[data-mod] {height:30px !important;}
+  #affinityShortcutGame.asg-playing .asg-touch-keyboard {padding:6px !important;gap:3px !important;}
+}
+@media (max-width: 355px) {
+  #affinityShortcutGame .asg-header h2 {font-size:25px !important;}
+  #affinityShortcutGame .asg-touch-special {gap:2px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button {font-size:11px !important;padding:0 !important;}
+}
+/* Coarse-pointer landscape tablets also get the usable shortcut keyboard. */
+@media (pointer: coarse) and (min-width:821px) and (max-width:1180px) {
+  #affinityShortcutGame.asg-playing .asg-wrap {height:var(--au-mobile-vh,100dvh) !important;min-height:0 !important;max-height:var(--au-mobile-vh,100dvh) !important;overflow:hidden !important;}
+  #affinityShortcutGame.asg-playing .asg-game-area {flex:1 1 0 !important;min-height:170px !important;height:0 !important;max-height:none !important;}
+  #affinityShortcutGame.asg-playing .asg-touch-keyboard {display:flex !important;flex:0 0 auto !important;flex-direction:column !important;gap:5px !important;width:min(720px,100%) !important;margin:6px auto 0 !important;padding:9px !important;background:#0d1c3e !important;border:1px solid #385179 !important;border-radius:13px !important;}
+  #affinityShortcutGame .asg-touch-header {display:flex;align-items:center;justify-content:space-between;color:#bbd3ff;font-size:12px;}
+  #affinityShortcutGame .asg-touch-mods {display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+  #affinityShortcutGame .asg-touch-keys {display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:5px;}
+  #affinityShortcutGame .asg-touch-special {display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:5px;}
+  #affinityShortcutGame .asg-touch-keyboard button {display:flex !important;align-items:center !important;justify-content:center !important;min-width:0 !important;min-height:36px !important;height:36px !important;padding:0 6px !important;border:1px solid #354e77 !important;background:#20375a !important;color:#fff !important;border-radius:8px !important;font-size:14px !important;box-shadow:none !important;}
+  #affinityShortcutGame .asg-touch-keyboard button[aria-pressed="true"],#affinityShortcutGame .asg-touch-keyboard button[data-action="send"] {background:#0064ff !important;border-color:#76b5ff !important;}
+}
+</style>
+
+<style id="auMobileShortcutMoreArenaV2">
+#affinityShortcutGame .asg-game-area .asg-lane-label {display:none !important;}
+
+/* Mobile play only: tiny HUD, full-width playfield, slim shortcut keypad. */
+@media (max-width:820px), (pointer:coarse) and (min-width:821px) and (max-width:1180px) {
+  #affinityShortcutGame #asgFullscreenBtn {display:none !important;}
+  #affinityShortcutGame .asg-game-area .asg-lane-label {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-wrap {
+    box-sizing:border-box !important;
+    width:100% !important;
+    height:var(--au-mobile-vh,100dvh) !important;
+    min-height:0 !important; max-height:var(--au-mobile-vh,100dvh) !important;
+    overflow:hidden !important;
+    padding:max(4px,env(safe-area-inset-top)) 7px max(4px,env(safe-area-inset-bottom)) !important;
+    border-radius:0 !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-header {
+    display:block !important;
+    height:39px !important; min-height:39px !important;
+    padding:0 !important; margin:0 0 4px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-header > div:first-child {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-stats {
+    display:grid !important; width:100% !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    height:39px !important;min-height:39px !important;
+    gap:4px !important; margin:0 !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-stat {
+    height:39px !important;min-height:39px !important;
+    border-radius:8px !important;padding:3px 1px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-stat span {
+    font-size:9px !important;margin:0 !important;line-height:12px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-stat strong {
+    font-size:16px !important;line-height:20px !important;height:20px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-heart-stat strong {gap:0 !important;white-space:nowrap !important;}
+  #affinityShortcutGame.asg-playing .asg-heart-stat i {font-size:clamp(9px,3vw,14px) !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar {
+    display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;margin:0 0 4px !important;
+    min-height:34px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-toolbar #asgStartBtn,
+  #affinityShortcutGame.asg-playing .asg-toolbar #asgFullscreenBtn {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar > button:not(#asgStartBtn):not(#asgFullscreenBtn) {
+    display:block !important;width:100% !important;height:34px !important;min-height:34px !important;
+    font-size:12px !important;padding:0 8px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-level-panel {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-game-area {
+    flex:1 1 0 !important;height:0 !important;
+    min-height:110px !important;max-height:none !important;
+    margin:0 0 4px !important;border-radius:13px !important;
+  }
+  #affinityShortcutGame.asg-playing .asg-last-key {display:none !important;}
+  #affinityShortcutGame .asg-card {
+    width:min(156px,calc(100% - 14px)) !important;
+    min-height:58px !important; padding:5px !important; border-width:2px !important;
+    border-radius:12px !important;
+  }
+  #affinityShortcutGame .asg-card::before {border-radius:14px !important;}
+  #affinityShortcutGame .asg-card-kbd {min-height:35px !important;padding:3px 4px !important;border-radius:8px !important;}
+  #affinityShortcutGame .asg-card-shortcut {font-size:clamp(12px,3.65vw,16px) !important;line-height:1.12 !important;}
+  #affinityShortcutGame .asg-card-name {font-size:10px !important;line-height:1.1 !important;margin:3px 0 0 !important;}
+  #affinityShortcutGame .asg-card-helper {
+    width:47px !important;height:47px !important;top:-39px !important;
+    animation:asgCardHang .82s ease-in-out infinite alternate;
+  }
+  #affinityShortcutGame .asg-bottom-line {bottom:26px !important;height:2px !important;}
+  #affinityShortcutGame.asg-playing .asg-touch-keyboard {
+    display:flex !important;flex:0 0 auto !important;
+    width:100% !important;max-width:none !important;
+    margin:0 !important;padding:5px !important;gap:3px !important;
+    border-radius:10px !important;
+  }
+  #affinityShortcutGame .asg-touch-header {min-height:14px !important;line-height:14px !important;}
+  #affinityShortcutGame .asg-touch-header strong,
+  #affinityShortcutGame .asg-touch-header span {font-size:9px !important;}
+  #affinityShortcutGame .asg-touch-mods,
+  #affinityShortcutGame .asg-touch-keys,
+  #affinityShortcutGame .asg-touch-special {gap:3px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button,
+  #affinityShortcutGame .asg-touch-keyboard button[data-mod] {
+    height:33px !important;min-height:33px !important;padding:0 1px !important;
+    font-size:12px !important;border-radius:6px !important;
+  }
+  #affinityShortcutGame .asg-touch-special button {font-size:11px !important;}
+  #affinityShortcutGame .asg-license-mark {display:none !important;}
+}
+@media (max-height:620px) and (max-width:820px) {
+  #affinityShortcutGame.asg-playing .asg-header,
+  #affinityShortcutGame.asg-playing .asg-stats,
+  #affinityShortcutGame.asg-playing .asg-stat {height:34px !important;min-height:34px !important;}
+  #affinityShortcutGame.asg-playing .asg-toolbar,
+  #affinityShortcutGame.asg-playing .asg-toolbar > button:not(#asgStartBtn):not(#asgFullscreenBtn) {min-height:30px !important;height:30px !important;}
+  #affinityShortcutGame .asg-touch-keyboard button,
+  #affinityShortcutGame .asg-touch-keyboard button[data-mod] {height:29px !important;min-height:29px !important;}
+  #affinityShortcutGame .asg-touch-header {display:none !important;}
+  #affinityShortcutGame.asg-playing .asg-touch-keyboard {padding:4px !important;gap:2px !important;}
+}
+</style>
+
+
+<style id="auMobileTransitionAndControlsV3">
+/* Keep the exact desktop feedback font family, weight, color, and glow on phones.
+   Only reduce font size responsively so the same design fits a narrow viewport. */
+@media (max-width:820px), (pointer:coarse) and (min-width:821px) and (max-width:1180px) {
+  #affinityShortcutGame .asg-game-area .asg-floating-word.combo-big-word:not(.asg-reference-praise),
+  #affinityShortcutGame .asg-game-area .asg-floating-word.speed-up:not(.asg-reference-praise),
+  #affinityShortcutGame .asg-game-area .asg-typing-gameover > strong {
+    font-family:"Pinkfong Baby Shark",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
+    font-weight:1000 !important;
+    line-height:1.08 !important;
+    letter-spacing:-.06em !important;
+    font-size:clamp(31px,9vw,50px) !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    -webkit-text-stroke:0 transparent !important;
+    paint-order:normal !important;
+    max-width:calc(100% - 12px) !important;
+    overflow:visible !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-floating-word.combo-big-word:not(.asg-reference-praise) {
+    color:#fff !important;
+    text-shadow:0 0 20px rgba(124,247,255,.8),0 14px 40px rgba(0,0,0,.4) !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-floating-word.speed-up:not(.asg-reference-praise),
+  #affinityShortcutGame .asg-game-area .asg-typing-gameover > strong {
+    color:#fff !important;
+    text-shadow:0 0 16px rgba(255,95,126,1),0 0 28px rgba(255,221,122,.95),0 18px 44px rgba(0,0,0,.52) !important;
+  }
+  /* Ready: one full-width START button. Hide controls that cannot be used yet. */
+  #affinityShortcutGame.asg-ready .asg-toolbar,
+  #affinityShortcutGame.asg-ended .asg-toolbar {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:0 !important;
+    width:100% !important;
+  }
+  #affinityShortcutGame.asg-ready .asg-toolbar > button:not(#asgStartBtn),
+  #affinityShortcutGame.asg-ended .asg-toolbar > button:not(#asgResetBtn) {display:none !important;}
+  #affinityShortcutGame.asg-ready #asgStartBtn,
+  #affinityShortcutGame.asg-ended #asgResetBtn {
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:46px !important;
+    min-height:46px !important;
+    font-size:15px !important;
+    margin:0 !important;
+  }
+  #affinityShortcutGame.asg-ended .asg-toolbar #asgResetBtn {
+    background:#0064ff !important;
+    border:1px solid rgba(154,203,255,.7) !important;
+    color:#fff !important;
+  }
+  #affinityShortcutGame #asgFullscreenBtn {display:none !important;}
+}
+</style>
+
+<style id="auEffectFontParityV5">
+/* Identical PC / mobile status typeface: the published Pinkfong Baby Shark Bold webface.
+   Never substitute Jua; all four game event cues use the same family on any device. */
+#affinityShortcutGame .asg-game-area .asg-floating-word.combo-big-word:not(.asg-reference-praise),
+#affinityShortcutGame .asg-game-area .asg-floating-word.speed-up:not(.asg-reference-praise),
+#affinityShortcutGame .asg-game-area .asg-typing-gameover > strong {
+  font-family:"핑크퐁 아기상어 서체","Pinkfong Baby Shark",Pretendard,-apple-system,sans-serif !important;
+  font-weight:400 !important;
+  font-synthesis:none !important;
+}
+@media (max-width:820px), (pointer:coarse) and (min-width:821px) and (max-width:1180px) {
+  #affinityShortcutGame .asg-game-area .asg-floating-word.combo-big-word:not(.asg-reference-praise),
+  #affinityShortcutGame .asg-game-area .asg-floating-word.speed-up:not(.asg-reference-praise),
+  #affinityShortcutGame .asg-game-area .asg-typing-gameover > strong {
+    font-size:clamp(31px,9vw,50px) !important;
+    max-width:calc(100% - 12px) !important;
+    white-space:nowrap !important;
+  }
+}
+</style>
+<script id="auEffectFontWarmupV4">
+/* Preload before the first effect appears, preventing a mobile fallback-font flash. */
+(function(){
+  function warm(){
+    if (!document.fonts || !document.fonts.load) return;
+    document.fonts.load('400 48px "핑크퐁 아기상어 서체"', 'GAME START! LEVEL UP! SPEED UP! GAME OVER').catch(function(){});
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',warm,{once:true});
+  else warm();
+})();
+</script>
+
+<style id="auCueVectorVisualV6">
+/* These four effects use the SAME SVG outlines on all desktop/mobile browsers.
+   Their visual appearance no longer depends on font download, font-family, or weight. */
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word),
+#affinityShortcutGame .asg-game-area .asg-typing-gameover > strong.au-cue-vector-v6,
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word),
+#app .game .gameover > strong.au-cue-vector-v6 {
+  display:block !important;
+  width:min(920px,84%) !important;
+  max-width:calc(100% - 12px) !important;
+  height:auto !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  font-size:0 !important;
+  line-height:0 !important;
+  letter-spacing:0 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  -webkit-text-stroke:0 transparent !important;
+  text-shadow:none !important;
+}
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="LEVEL UP!"],
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="LEVEL UP!"] {width:min(740px,79%) !important;}
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="SPEED UP!"],
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="SPEED UP!"] {width:min(790px,82%) !important;}
+#affinityShortcutGame .asg-game-area .asg-typing-gameover > strong.au-cue-vector-v6,
+#app .game .gameover > strong.au-cue-vector-v6 {width:min(840px,85%) !important;}
+#affinityShortcutGame .asg-game-area .au-cue-vector-v6 > svg,
+#app .game .au-cue-vector-v6 > svg {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-width:none !important;
+  overflow:visible !important;
+  fill:white !important;
+  filter:drop-shadow(0 0 7px rgba(140,246,255,.78)) drop-shadow(0 0 19px rgba(62,202,255,.54));
+}
+/* Event-specific glow remains distinct while letter shapes are identical. */
+#affinityShortcutGame .asg-game-area .au-cue-vector-v6[data-au-cue="LEVEL UP!"] > svg,
+#app .game .au-cue-vector-v6[data-au-cue="LEVEL UP!"] > svg {
+  filter:drop-shadow(0 0 8px rgba(122,242,255,.83)) drop-shadow(0 0 19px rgba(83,185,255,.49));
+}
+#affinityShortcutGame .asg-game-area .au-cue-vector-v6[data-au-cue="SPEED UP!"] > svg,
+#app .game .au-cue-vector-v6[data-au-cue="SPEED UP!"] > svg {
+  filter:drop-shadow(0 0 8px rgba(255,156,98,.77)) drop-shadow(0 0 20px rgba(255,113,139,.59));
+}
+#affinityShortcutGame .asg-game-area .au-cue-vector-v6[data-au-cue="GAME OVER"] > svg,
+#app .game .au-cue-vector-v6[data-au-cue="GAME OVER"] > svg {
+  filter:drop-shadow(0 0 9px rgba(255,102,128,.78)) drop-shadow(0 0 19px rgba(240,68,100,.43));
+}
+#affinityShortcutGame .asg-game-area .au-cue-sr-v6,
+#app .game .au-cue-sr-v6 {
+  position:absolute !important;
+  width:1px !important; height:1px !important;
+  padding:0 !important; margin:-1px !important;
+  overflow:hidden !important; clip-path:inset(50%) !important;
+  white-space:nowrap !important;
+}
+</style>
+<script id="auSameEffectOutlinesV6">
+/* Fixed vector letterforms for the four English cue phrases.
+   SVG paths are used to prevent system-font or remote-font fallback on phones.
+   No font binary is embedded or shipped. */
+(function(){
+  const shapes = {"GAME START!":{"viewBox":"16 -1538 13880 1586","path":"M772 -24C1185 -24 1460 229 1460 617V832H784V535H1054C1050 415 956 336 787 336C572 336 460 479 460 744C460 1009 570 1154 781 1154C924 1154 1004 1087 1025 976H1449C1422 1300 1127 1514 764 1514C357 1514 40 1242 40 744C40 273 328 -24 772 -24ZM1488 0H1943L2016 245H2514L2585 0H3053L2548 1490H1988ZM2112 565 2116 578C2170 758 2220 932 2269 1113C2317 932 2366 758 2418 578L2422 565ZM3105 0H3513V576C3513 672 3505 863 3500 1047C3548 865 3598 677 3629 576L3805 0H4141L4314 576C4345 681 4397 878 4444 1065C4440 876 4431 676 4431 576V0H4839V1490H4216L4084 1024C4055 923 4011 750 3973 597C3935 750 3890 923 3861 1024L3727 1490H3105ZM4971 0H6125V352H5387V574H6068V914H5387V1138H6125V1490H4971ZM7209 -24C7613 -24 7844 154 7844 466C7844 704 7699 836 7357 899L7237 921C7082 949 7015 987 7015 1058C7015 1133 7097 1186 7214 1186C7338 1186 7421 1122 7431 1018H7813C7803 1330 7578 1514 7206 1514C6844 1514 6597 1321 6597 1038C6597 817 6753 664 7041 609L7189 581C7357 549 7433 507 7433 435C7433 357 7345 304 7214 304C7063 304 6968 375 6962 496H6569C6569 161 6796 -24 7209 -24ZM7920 1138H8344V0H8760V1138H9184V1490H7920ZM9196 0H9651L9724 245H10222L10293 0H10761L10256 1490H9696ZM9820 565 9824 578C9878 758 9928 932 9977 1113C10025 932 10074 758 10126 578L10130 565ZM10813 0H11229V466H11415L11638 0H12071L11798 556C11943 642 12025 785 12025 970C12025 1289 11802 1490 11446 1490H10813ZM11229 788V1152H11415C11540 1152 11619 1079 11619 970C11619 861 11540 788 11415 788ZM12108 1138H12532V0H12948V1138H13372V1490H12108ZM13486 472H13834L13872 1490H13448ZM13660 -19C13775 -19 13868 74 13868 189C13868 304 13775 397 13660 397C13545 397 13452 304 13452 189C13452 74 13545 -19 13660 -19Z"},"LEVEL UP!":{"viewBox":"56 -1514 9859 1562","path":"M80 0H1138V352H496V1490H80ZM1230 0H2384V352H1646V574H2327V914H1646V1138H2384V1490H1230ZM2916 0H3468L3952 1490H3500L3335 912C3285 738 3239 565 3194 391C3147 565 3099 738 3047 912L2874 1490H2416ZM4004 0H5158V352H4420V574H5101V914H4420V1138H5158V1490H4004ZM5270 0H6328V352H5686V1490H5270ZM7410 -24C7799 -24 8052 194 8052 530V1490H7648V564C7648 425 7550 326 7410 326C7272 326 7172 426 7172 564V1490H6768V530C6768 193 7020 -24 7410 -24ZM8184 0H8600V450H8817C9173 450 9396 651 9396 970C9396 1289 9173 1490 8817 1490H8184ZM8600 792V1148H8786C8911 1148 8990 1079 8990 970C8990 861 8911 792 8786 792ZM9505 472H9853L9891 1490H9467ZM9679 -19C9794 -19 9887 74 9887 189C9887 304 9794 397 9679 397C9564 397 9471 304 9471 189C9471 74 9564 -19 9679 -19Z"},"SPEED UP!":{"viewBox":"40 -1538 10169 1586","path":"M704 -24C1108 -24 1339 154 1339 466C1339 704 1194 836 852 899L732 921C577 949 510 987 510 1058C510 1133 592 1186 709 1186C833 1186 916 1122 926 1018H1308C1298 1330 1073 1514 701 1514C339 1514 92 1321 92 1038C92 817 248 664 536 609L684 581C852 549 928 507 928 435C928 357 840 304 709 304C558 304 463 375 457 496H64C64 161 291 -24 704 -24ZM1455 0H1871V450H2088C2444 450 2667 651 2667 970C2667 1289 2444 1490 2088 1490H1455ZM1871 792V1148H2057C2182 1148 2261 1079 2261 970C2261 861 2182 792 2057 792ZM2754 0H3908V352H3170V574H3851V914H3170V1138H3908V1490H2754ZM4020 0H5174V352H4436V574H5117V914H4436V1138H5174V1490H4020ZM5868 0C6327 0 6622 292 6622 744C6622 1197 6322 1490 5862 1490H5286V0ZM5702 344V1146H5836C6087 1146 6202 1017 6202 744C6202 473 6091 344 5848 344ZM7704 -24C8093 -24 8346 194 8346 530V1490H7942V564C7942 425 7844 326 7704 326C7566 326 7466 426 7466 564V1490H7062V530C7062 193 7314 -24 7704 -24ZM8478 0H8894V450H9111C9467 450 9690 651 9690 970C9690 1289 9467 1490 9111 1490H8478ZM8894 792V1148H9080C9205 1148 9284 1079 9284 970C9284 861 9205 792 9080 792ZM9799 472H10147L10185 1490H9761ZM9973 -19C10088 -19 10181 74 10181 189C10181 304 10088 397 9973 397C9858 397 9765 304 9765 189C9765 74 9858 -19 9973 -19Z"},"GAME OVER":{"viewBox":"16 -1538 12125 1586","path":"M772 -24C1185 -24 1460 229 1460 617V832H784V535H1054C1050 415 956 336 787 336C572 336 460 479 460 744C460 1009 570 1154 781 1154C924 1154 1004 1087 1025 976H1449C1422 1300 1127 1514 764 1514C357 1514 40 1242 40 744C40 273 328 -24 772 -24ZM1488 0H1943L2016 245H2514L2585 0H3053L2548 1490H1988ZM2112 565 2116 578C2170 758 2220 932 2269 1113C2317 932 2366 758 2418 578L2422 565ZM3105 0H3513V576C3513 672 3505 863 3500 1047C3548 865 3598 677 3629 576L3805 0H4141L4314 576C4345 681 4397 878 4444 1065C4440 876 4431 676 4431 576V0H4839V1490H4216L4084 1024C4055 923 4011 750 3973 597C3935 750 3890 923 3861 1024L3727 1490H3105ZM4971 0H6125V352H5387V574H6068V914H5387V1138H6125V1490H4971ZM7269 -24C7674 -24 7993 247 7993 744C7993 1242 7674 1514 7269 1514C6862 1514 6545 1242 6545 744C6545 250 6862 -24 7269 -24ZM7269 336C7074 336 6965 487 6965 744C6965 1002 7074 1154 7269 1154C7465 1154 7573 1002 7573 744C7573 487 7465 336 7269 336ZM8505 0H9057L9541 1490H9089L8924 912C8874 738 8828 565 8783 391C8736 565 8688 738 8636 912L8463 1490H8005ZM9593 0H10747V352H10009V574H10690V914H10009V1138H10747V1490H9593ZM10859 0H11275V466H11461L11684 0H12117L11844 556C11989 642 12071 785 12071 970C12071 1289 11848 1490 11492 1490H10859ZM11275 788V1152H11461C11586 1152 11665 1079 11665 970C11665 861 11586 788 11461 788Z"}};
+  const ns = 'http://www.w3.org/2000/svg';
+  window.auApplyCueVector = function(target, text) {
+    if (!target) return false;
+    const key = String(text || '').trim().replace(/\s+/g, ' ').toUpperCase();
+    const shape = shapes[key];
+    if (!shape) return false;
+    const svg = document.createElementNS(ns,'svg');
+    svg.setAttribute('viewBox',shape.viewBox);
+    svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+    svg.setAttribute('aria-hidden','true');
+    svg.setAttribute('focusable','false');
+    const p=document.createElementNS(ns,'path');
+    p.setAttribute('d',shape.path);
+    p.setAttribute('transform','scale(1,-1)');
+    p.setAttribute('fill','#ffffff');
+    svg.appendChild(p);
+    const sr=document.createElement('span');
+    sr.className='au-cue-sr-v6';
+    sr.textContent=key;
+    target.replaceChildren(svg,sr);
+    target.classList.add('au-cue-vector-v6');
+    target.setAttribute('data-au-cue',key);
+    target.setAttribute('aria-label',key);
+    return true;
+  };
+})();
+</script>
+
+<style id="auUnifiedFeedbackSizingV8">
+/* GAME START / LEVEL UP / SPEED UP / GAME OVER are scaled to approximately
+   the same visible cap height as the existing GREAT / COMBO / GOOD JOB / EXCELLENT.
+   The four cues retain their SVG outlines, color, glow, and animation.
+   Viewport-relative widths avoid size differences between the two game's
+   differently padded mobile play areas. No praise styles are changed. */
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word),
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word) {
+  width: clamp(220px, 61vw, 665px) !important;
+  height: auto !important;
+  max-width: calc(100% - 16px) !important;
+  min-width: 0 !important;
+}
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="LEVEL UP!"],
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="LEVEL UP!"] {
+  width: clamp(160px, 46vw, 475px) !important;
+}
+#affinityShortcutGame .asg-game-area .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="SPEED UP!"],
+#app .game .asg-floating-word.au-cue-vector-v6:not(.asg-reference-praise):not(.game-over-word)[data-au-cue="SPEED UP!"] {
+  width: clamp(160px, 47vw, 485px) !important;
+}
+#affinityShortcutGame .asg-game-area .asg-typing-gameover > strong.au-cue-vector-v6,
+#app .game .gameover > strong.au-cue-vector-v6 {
+  width: clamp(190px, 54vw, 580px) !important;
+  height: auto !important;
+  max-width: calc(100% - 16px) !important;
+  min-width: 0 !important;
+}
+#affinityShortcutGame .asg-game-area .au-cue-vector-v6 > svg,
+#app .game .au-cue-vector-v6 > svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  object-fit: contain !important;
+}
+/* Praise captions deliberately unchanged. */
+#affinityShortcutGame .asg-game-area .asg-floating-word.asg-reference-praise,
+#app .game .asg-floating-word.asg-reference-praise {
+  font-size: clamp(35px, 10vw, 106px) !important;
+  line-height: 1 !important;
+  max-width: calc(100% - 16px) !important;
+  white-space: nowrap !important;
 }
 </style>
 </body>
