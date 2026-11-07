@@ -84,15 +84,7 @@ html.au-phone-blocked #auPhoneGateV136{
     const tag=((e.target&&e.target.tagName)||'').toLowerCase();
     const isI=e.code==='KeyI'||e.key==='i'||e.key==='I';
     if(!isI)return;
-    if(tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable))return;
-    if(tag==='input'){
-      if(e.target&&e.target.id==='afFileName'){
-        const mt=document.getElementById('afMissionTitle');
-        const title=(mt&&mt.textContent)||'';
-        if(/파일\s*이름|이름\s*바꾸기/.test(title))return;
-        try{e.target.blur();}catch(_e){}
-      }else return;
-    }
+    if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable))return;
     if(!isI||e.metaKey||e.ctrlKey||e.altKey)return;
     if(typeof window.__afToggleEyedropperV43!=='function')return;
     e.preventDefault();
@@ -3016,7 +3008,7 @@ fileName.blur();
 root.focus();
 }
 });
-fileName.addEventListener("input",()=>{if(m().key==="rename"&&fileName.value.trim()&&fileName.value.trim().toLowerCase()!=="untitled")next("파일 이름 변경 성공!")});
+// Filename mission is completed on Enter / blur by afV73CommitFilename, not on every input event.
 $$(".af-mode").forEach(b=>b.onclick=()=>{$$(".af-mode").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
 $$(".af-tool").forEach(b=>b.onclick=()=>setTool(b.dataset.tool,true));
 shapeTool.addEventListener("pointerdown",()=>{clearTimeout(shapeTimer);shapeTimer=setTimeout(()=>{shapeMenu.classList.add("show");if(m().key==="shapeMenu")next("도형 메뉴 확인!")},450)});
@@ -3404,9 +3396,7 @@ fileName.style.pointerEvents = "auto";
 fileName.style.caretColor = "#fff";
 
 function finishFileNameInput(){
-if(m().key==="rename" && fileName.value.trim() && fileName.value.trim().toLowerCase()!=="untitled"){
-next("파일 이름 변경 성공!");
-}
+// Never advance while the learner is still entering a filename.
 }
 
 function replaceFileNameRange(insertText,start,end){
@@ -9261,14 +9251,8 @@ let afV63FileComposing=false;
 let afV63FileRenameDone=false;
 
 function afV63CleanRepeatedTail(value){
-let v=String(value||'');
-// 브라우저/IME 조합에서 마지막 단어가 두 번 붙는 경우만 정리합니다. 예: "네임네임" → "네임", "보드 테스트테스트" → "보드 테스트"
-try{
-v=v.replace(/(^|[\s_\-])([\p{L}\p{N}]{2,20})\2$/u,'$1$2');
-}catch(e){
-v=v.replace(/(^|[\s_\-])([A-Za-z0-9가-힣]{2,20})\2$/,'$1$2');
-}
-return v;
+// Preserve exactly what the learner typed, including rabbit / puppy and Korean names.
+return String(value ?? '');
 }
 
 function afV63NormalizeFileName(){
@@ -9470,27 +9454,9 @@ return /[가-힣]/.test(String(text||''));
 }
 
 function afV64CleanFileNameValue(value){
-let v=String(value||'');
-v=v.replace(/[\u200B\uFEFF]/g,'');
-
-// 1) 한글 IME에서 마지막 음절이 한 번 더 붙는 케이스: "네임임" → "네임"
-v=v.replace(/([가-힣])\1$/,'$1');
-
-// 2) 마지막 단어 전체가 한 번 더 붙는 케이스: "네임네임" → "네임", "아트보드 테스트테스트" → "아트보드 테스트"
-const maxLen=Math.min(28,Math.floor(v.length/2));
-for(let len=maxLen;len>=1;len--){
-const tail=v.slice(-len);
-const prev=v.slice(-len*2,-len);
-if(tail && tail===prev && afV64HasHangul(tail)){
-v=v.slice(0,-len);
-break;
-}
-}
-
-// 3) 공백을 두고 같은 한글 단어가 한 번 더 들어간 케이스: "네임 네임" → "네임"
-v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,28})\s+\2$/u,'$1$2');
-
-return v;
+// Do not remove duplicated letters or words from free-form filenames.
+// Only strip invisible BOM / zero-width formatting characters.
+return String(value ?? '').replace(/[\u200B\uFEFF]/g, '');
 }
 
 function afV64NormalizeFileNameNow(){
@@ -10739,15 +10705,9 @@ let afV73FilenameComposing=false;
 let afV73FilenameCommitted=false;
 
 function afV73CleanFilename(value){
-let v=String(value||'').replace(/[\u200B\uFEFF]/g,'').trim();
-// IME/브라우저 조합에서 마지막 글자 또는 단어가 한 번 더 붙는 케이스 정리
-v=v.replace(/([가-힣A-Za-z0-9])\1$/u,'$1');
-for(let len=Math.min(32,Math.floor(v.length/2));len>=1;len--){
-const a=v.slice(-len), b=v.slice(-len*2,-len);
-if(a && a===b){v=v.slice(0,-len);break;}
-}
-v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,32})\s+\2$/u,'$1$2');
-return v;
+// Keep every typed letter, including repeated consonants/vowels (bb, pp, oo).
+// Whitespace is retained while typing and ignored only for completion validation.
+return String(value ?? '').replace(/[\u200B\uFEFF]/g, '');
 }
 
 function afV73NormalizeFilename(){
@@ -17161,7 +17121,7 @@ art.addEventListener('pointerup',()=>{
 const ex0=exportBtn&&exportBtn.onclick;if(exportBtn)exportBtn.onclick=function(e){let c=cur();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e&&e.preventDefault&&e.preventDefault();say('먼저 파일 이름을 바꿔볼까요?');try{fileName.focus();fileName.select()}catch(x){}return}if(c&&c.type==='export')try{hideGuide()}catch(x){}return ex0?ex0.call(this,e):undefined};
 function go(k){if(window.__auIpadOnly)return;clearTimeout(rt);rt=setTimeout(()=>{let i=missions.findIndex(x=>x&&x.key===k);if(i>=0){mission=i;renderMission()}},120)}
 fileName.addEventListener('keydown',e=>{let c=cur();if(c&&(e.key==='Enter'||e.key==='Tab')&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e.preventDefault();go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')}},true);
-fileName.addEventListener('input',()=>{let c=cur(),v=fileName.value.trim().toLowerCase();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')&&v&&v!=='untitled')go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')},true);
+// Bunny / puppy rename is confirmed by Enter through the existing afV123 handler, not by typing the first letter.
 afV50PlayMissionHtml=()=>celebrate();
 const ug=updateGuideState;updateGuideState=function(){
 const r=ug.apply(this,arguments),c=cur(),animal=guideAnimal(c);
