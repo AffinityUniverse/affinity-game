@@ -1047,9 +1047,9 @@ html, body {
       <h2 id="typingFinalTitle">타이핑 게임이 종료되었어요.<br>다른 게임도 하러 가볼까요? <span class="af-final-pad-v47" aria-hidden="true">🚀</span></h2>
       <p id="typingFinalDesc">원하는 게임을 골라 바로 이어서 플레이해보세요.</p>
       <div class="af-final-game-grid-v34" aria-label="다음 활동 선택">
-        <a class="af-final-game-link-v34" href="shortcut.html" target="_blank" rel="noopener noreferrer"><span class="af-final-game-icon-v34" aria-hidden="true">⌨</span><strong>단축키 게임</strong><small>Affinity 단축키 맞추기</small></a>
+        <a class="af-final-game-link-v34" href="shortcut.html" target="_top"><span class="af-final-game-icon-v34" aria-hidden="true">⌨</span><strong>단축키 게임</strong><small>Affinity 단축키 맞추기</small></a>
         <button type="button" class="af-final-game-link-v34" id="typingFinalReplayBtn" aria-label="타이핑 게임 다시하기"><span class="af-final-game-icon-v34" aria-hidden="true">Aa</span><strong>타이핑 게임</strong><small>다시하기</small></button>
-        <a class="af-final-game-link-v34" href="tutorial.html" target="_blank" rel="noopener noreferrer"><span class="af-final-game-icon-v34" aria-hidden="true">✎</span><strong>튜토리얼</strong><small>디자인 기초 연습하기</small></a>
+        <a class="af-final-game-link-v34" href="tutorial.html" target="_top"><span class="af-final-game-icon-v34" aria-hidden="true">✎</span><strong>튜토리얼</strong><small>디자인 기초 연습하기</small></a>
       </div>
       <a class="af-final-consult-link-v35" href="https://pf.kakao.com/_xhbxdib" target="_blank" rel="noopener noreferrer">어피니티 유니버스 상담하기 <span aria-hidden="true">→</span></a>
     </div>
@@ -1902,10 +1902,10 @@ function start(autoFullscreen=true,playClick=true){
   state.activeCharacter={...selectedCharacter()};
   state.runId='run-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
   const generation=++animationGeneration;
-  $('#app').classList.remove('typing-ended');$('#app').classList.add('typing-in-game');unlockAudio();if(playClick)soundButtonClick();if(autoFullscreen&&!isMobileTypingMode())enterGameFullscreen();hideFinalNextGame();clearCards();if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');const pb=$('#pauseBtn');pb.textContent='일시정지';pb.classList.remove('resume-active');state.running=true;state.paused=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.spawn=0;state.last=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};input.disabled=false;input.value='';ready.classList.add('hide');$('#startBtn').disabled=true;$('#pauseBtn').disabled=false;language.disabled=true;difficulty.disabled=true;category.disabled=true;playerName.disabled=true;updateUI();try{input.focus({preventScroll:true})}catch(_){input.focus()}playGameStartVoice();floatingWord('GAME START!','combo-big-word');spawnCard();startBgm();requestAnimationFrame(t=>loop(t,generation))}
+  $('#app').classList.remove('typing-ended');$('#app').classList.add('typing-in-game');unlockAudio();if(playClick)soundButtonClick();if(autoFullscreen&&!isMobileTypingMode())enterGameFullscreen();hideFinalNextGame();clearCards();if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');const pb=$('#pauseBtn');pb.textContent='일시정지';pb.classList.remove('resume-active');state.running=true;state.paused=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.spawn=0;state.last=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};input.disabled=false;input.value='';ready.classList.add('hide');$('#startBtn').disabled=true;$('#pauseBtn').disabled=false;language.disabled=true;difficulty.disabled=true;category.disabled=true;playerName.disabled=true;updateUI();window.auFocusTypingViewportV18(input);playGameStartVoice();floatingWord('GAME START!','combo-big-word');spawnCard();startBgm();requestAnimationFrame(t=>loop(t,generation))}
 function reset(){animationGeneration++;koreanComposing=false;$('#app').classList.remove('typing-in-game','typing-ended');hideFinalNextGame();stopBgm();state.running=false;state.paused=false;if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');clearCards();input.disabled=true;input.value='';ready.classList.remove('hide');$('#startBtn').disabled=false;$('#pauseBtn').disabled=true;$('#pauseBtn').textContent='일시정지';$('#pauseBtn').classList.remove('resume-active');language.disabled=false;difficulty.disabled=false;category.disabled=false;playerName.disabled=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};renderReview();updateUI()}
 function restart(){soundButtonClick();reset();start(false,false)}
-function pause(){if(!state.running)return;soundButtonClick();const pb=$('#pauseBtn');if(!state.paused){state.paused=true;pb.textContent='계속하기';pb.classList.add('resume-active');input.disabled=true;if(pauseOverlay)pauseOverlay.classList.add('show');stopBgm()}else{state.paused=false;pb.textContent='일시정지';pb.classList.remove('resume-active');input.disabled=false;if(pauseOverlay)pauseOverlay.classList.remove('show');input.focus();startBgm()}}
+function pause(){if(!state.running)return;soundButtonClick();const pb=$('#pauseBtn');if(!state.paused){state.paused=true;pb.textContent='계속하기';pb.classList.add('resume-active');input.disabled=true;if(pauseOverlay)pauseOverlay.classList.add('show');stopBgm()}else{state.paused=false;pb.textContent='일시정지';pb.classList.remove('resume-active');input.disabled=false;if(pauseOverlay)pauseOverlay.classList.remove('show');window.auFocusTypingViewportV18(input);startBgm()}}
 function loop(t,generation){
   if(!state.running||generation!==animationGeneration)return;
   if(!state.last)state.last=t;
@@ -3637,7 +3637,7 @@ body { display:block !important; min-height:100vh !important; background:#0b1328
   trigger.addEventListener('click',function(e){
     e.preventDefault();
     if(field.disabled)return;
-    try{field.focus({preventScroll:true})}catch(_){field.focus()}
+    window.auFocusTypingViewportV18(field);
   });
   bar.appendChild(trigger);
   function sync(){root.classList.toggle('au-touch-tablet',window.innerWidth>820 && hasTouch());}
@@ -3946,5 +3946,118 @@ body { display:block !important; min-height:100vh !important; background:#0b1328
          drop-shadow(0 0 22px rgba(236,24,64,.75)) !important;
 }
 </style>
+
+<style id="auTypingVisualViewportAnchorV18">
+/* Keep the whole active typing arena inside the visible viewport while an
+   iPad / iPhone software keyboard resizes or pans Safari's visual viewport. */
+html.au-typing-viewport-lock-v18,
+body.au-typing-viewport-lock-v18 {
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+#app.typing-in-game.au-typing-viewport-anchor-v18 {
+  position:fixed !important;
+  inset:auto !important;
+  top:var(--au-vv-top-v18,0px) !important;
+  left:var(--au-vv-left-v18,0px) !important;
+  right:auto !important;
+  bottom:auto !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+  width:var(--au-vv-width-v18,100vw) !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:var(--au-vv-height-v18,100dvh) !important;
+  min-height:0 !important;
+  max-height:var(--au-vv-height-v18,100dvh) !important;
+  overflow:hidden !important;
+  transform:none !important;
+  border-radius:0 !important;
+}
+#app.typing-in-game.au-typing-viewport-anchor-v18 .game {
+  flex:1 1 0 !important;
+  min-height:110px !important;
+  height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+}
+#app.au-typing-viewport-anchor-v18 .typingbar input {
+  font-size:max(16px,1em) !important;
+}
+</style>
+
+<script id="auTypingVisualViewportAnchorLogicV18">
+(function(){
+  'use strict';
+  const app=document.getElementById('app');
+  const field=document.getElementById('typing');
+  if(!app || !field)return;
+  const html=document.documentElement;
+  const body=document.body;
+  const lock='au-typing-viewport-lock-v18';
+  const anchor='au-typing-viewport-anchor-v18';
+  let lastActive=false;
+  function isTouchDevice(){
+    return (navigator.maxTouchPoints||0)>0 ||
+      !!(window.matchMedia &&
+        (window.matchMedia('(pointer:coarse)').matches ||
+         window.matchMedia('(any-pointer:coarse)').matches));
+  }
+  function isActive(){return isTouchDevice() && app.classList.contains('typing-in-game');}
+  function syncViewport(){
+    const active=isActive();
+    app.classList.toggle(anchor,active);
+    html.classList.toggle(lock,active);
+    body.classList.toggle(lock,active);
+    if(!active){lastActive=false;return;}
+    const vv=window.visualViewport;
+    const h=vv ? vv.height : window.innerHeight;
+    const w=vv ? vv.width : window.innerWidth;
+    // iOS may pan the visual viewport when the native keyboard opens.
+    // The offset is relative to the layout viewport, where fixed lives.
+    const top=vv ? Math.max(0,vv.offsetTop||0,(Number.isFinite(vv.pageTop)?vv.pageTop-window.scrollY:0)) : 0;
+    const left=vv ? Math.max(0,vv.offsetLeft||0) : 0;
+    app.style.setProperty('--au-vv-height-v18',Math.max(230,Math.round(h))+'px');
+    app.style.setProperty('--au-vv-width-v18',Math.max(270,Math.round(w))+'px');
+    app.style.setProperty('--au-vv-top-v18',Math.round(top)+'px');
+    app.style.setProperty('--au-vv-left-v18',Math.round(left)+'px');
+    if(!lastActive){lastActive=true;}
+  }
+  function syncAfterKeyboard(){
+    syncViewport();
+    requestAnimationFrame(syncViewport);
+    window.setTimeout(syncViewport,90);
+    window.setTimeout(syncViewport,280);
+  }
+  // Exposed only for the existing start/resume/explicit show-keyboard controls.
+  window.auFocusTypingViewportV18=function(target){
+    target=target||field;
+    if(!isActive()){
+      try{target.focus({preventScroll:true});}catch(_){target.focus();}
+      return;
+    }
+    // Let Safari see the compact fixed game before checking input visibility.
+    syncViewport();
+    if(window.scrollY){try{window.scrollTo(0,0);}catch(_){}}
+    void app.offsetHeight;
+    try{target.focus({preventScroll:true});}catch(_){target.focus();}
+    syncAfterKeyboard();
+  };
+  for(const evt of ['resize','orientationchange'])
+    window.addEventListener(evt,syncAfterKeyboard,{passive:true});
+  window.addEventListener('scroll',syncViewport,{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',syncAfterKeyboard,{passive:true});
+    window.visualViewport.addEventListener('scroll',syncViewport,{passive:true});
+  }
+  field.addEventListener('focus',syncAfterKeyboard,{passive:true});
+  field.addEventListener('blur',syncAfterKeyboard,{passive:true});
+  // Reset button and game-over remove the playing class; release the lock.
+  new MutationObserver(syncViewport).observe(app,{attributes:true,attributeFilter:['class']});
+  syncViewport();
+})();
+</script>
 </body>
 </html>
