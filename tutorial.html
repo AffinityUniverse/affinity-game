@@ -84,7 +84,15 @@ html.au-phone-blocked #auPhoneGateV136{
     const tag=((e.target&&e.target.tagName)||'').toLowerCase();
     const isI=e.code==='KeyI'||e.key==='i'||e.key==='I';
     if(!isI)return;
-    if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable))return;
+    if(tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable))return;
+    if(tag==='input'){
+      if(e.target&&e.target.id==='afFileName'){
+        const mt=document.getElementById('afMissionTitle');
+        const title=(mt&&mt.textContent)||'';
+        if(/파일\s*이름|이름\s*바꾸기/.test(title))return;
+        try{e.target.blur();}catch(_e){}
+      }else return;
+    }
     if(!isI||e.metaKey||e.ctrlKey||e.altKey)return;
     if(typeof window.__afToggleEyedropperV43!=='function')return;
     e.preventDefault();
@@ -3008,7 +3016,7 @@ fileName.blur();
 root.focus();
 }
 });
-// Filename mission is completed on Enter / blur by afV73CommitFilename, not on every input event.
+fileName.addEventListener("input",()=>{if(m().key==="rename"&&fileName.value.trim()&&fileName.value.trim().toLowerCase()!=="untitled")next("파일 이름 변경 성공!")});
 $$(".af-mode").forEach(b=>b.onclick=()=>{$$(".af-mode").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
 $$(".af-tool").forEach(b=>b.onclick=()=>setTool(b.dataset.tool,true));
 shapeTool.addEventListener("pointerdown",()=>{clearTimeout(shapeTimer);shapeTimer=setTimeout(()=>{shapeMenu.classList.add("show");if(m().key==="shapeMenu")next("도형 메뉴 확인!")},450)});
@@ -3203,7 +3211,11 @@ return;
 }
 
 if(k.j){
+if(e.repeat){e.preventDefault();return;}
 if(selected.length){
+const at=performance.now();
+if(at-(window.__auLastCmdJExecV153||0)<540){e.preventDefault();return;}
+window.__auLastCmdJExecV153=at;
 e.__afShortcutDone=true;
 e.preventDefault();
 e.stopPropagation();
@@ -3396,7 +3408,9 @@ fileName.style.pointerEvents = "auto";
 fileName.style.caretColor = "#fff";
 
 function finishFileNameInput(){
-// Never advance while the learner is still entering a filename.
+if(m().key==="rename" && fileName.value.trim() && fileName.value.trim().toLowerCase()!=="untitled"){
+next("파일 이름 변경 성공!");
+}
 }
 
 function replaceFileNameRange(insertText,start,end){
@@ -9251,8 +9265,14 @@ let afV63FileComposing=false;
 let afV63FileRenameDone=false;
 
 function afV63CleanRepeatedTail(value){
-// Preserve exactly what the learner typed, including rabbit / puppy and Korean names.
-return String(value ?? '');
+let v=String(value||'');
+// 브라우저/IME 조합에서 마지막 단어가 두 번 붙는 경우만 정리합니다. 예: "네임네임" → "네임", "보드 테스트테스트" → "보드 테스트"
+try{
+v=v.replace(/(^|[\s_\-])([\p{L}\p{N}]{2,20})\2$/u,'$1$2');
+}catch(e){
+v=v.replace(/(^|[\s_\-])([A-Za-z0-9가-힣]{2,20})\2$/,'$1$2');
+}
+return v;
 }
 
 function afV63NormalizeFileName(){
@@ -9454,9 +9474,27 @@ return /[가-힣]/.test(String(text||''));
 }
 
 function afV64CleanFileNameValue(value){
-// Do not remove duplicated letters or words from free-form filenames.
-// Only strip invisible BOM / zero-width formatting characters.
-return String(value ?? '').replace(/[\u200B\uFEFF]/g, '');
+let v=String(value||'');
+v=v.replace(/[\u200B\uFEFF]/g,'');
+
+// 1) 한글 IME에서 마지막 음절이 한 번 더 붙는 케이스: "네임임" → "네임"
+v=v.replace(/([가-힣])\1$/,'$1');
+
+// 2) 마지막 단어 전체가 한 번 더 붙는 케이스: "네임네임" → "네임", "아트보드 테스트테스트" → "아트보드 테스트"
+const maxLen=Math.min(28,Math.floor(v.length/2));
+for(let len=maxLen;len>=1;len--){
+const tail=v.slice(-len);
+const prev=v.slice(-len*2,-len);
+if(tail && tail===prev && afV64HasHangul(tail)){
+v=v.slice(0,-len);
+break;
+}
+}
+
+// 3) 공백을 두고 같은 한글 단어가 한 번 더 들어간 케이스: "네임 네임" → "네임"
+v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,28})\s+\2$/u,'$1$2');
+
+return v;
 }
 
 function afV64NormalizeFileNameNow(){
@@ -10705,9 +10743,15 @@ let afV73FilenameComposing=false;
 let afV73FilenameCommitted=false;
 
 function afV73CleanFilename(value){
-// Keep every typed letter, including repeated consonants/vowels (bb, pp, oo).
-// Whitespace is retained while typing and ignored only for completion validation.
-return String(value ?? '').replace(/[\u200B\uFEFF]/g, '');
+let v=String(value||'').replace(/[\u200B\uFEFF]/g,'').trim();
+// IME/브라우저 조합에서 마지막 글자 또는 단어가 한 번 더 붙는 케이스 정리
+v=v.replace(/([가-힣A-Za-z0-9])\1$/u,'$1');
+for(let len=Math.min(32,Math.floor(v.length/2));len>=1;len--){
+const a=v.slice(-len), b=v.slice(-len*2,-len);
+if(a && a===b){v=v.slice(0,-len);break;}
+}
+v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,32})\s+\2$/u,'$1$2');
+return v;
 }
 
 function afV73NormalizeFilename(){
@@ -17121,7 +17165,7 @@ art.addEventListener('pointerup',()=>{
 const ex0=exportBtn&&exportBtn.onclick;if(exportBtn)exportBtn.onclick=function(e){let c=cur();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e&&e.preventDefault&&e.preventDefault();say('먼저 파일 이름을 바꿔볼까요?');try{fileName.focus();fileName.select()}catch(x){}return}if(c&&c.type==='export')try{hideGuide()}catch(x){}return ex0?ex0.call(this,e):undefined};
 function go(k){if(window.__auIpadOnly)return;clearTimeout(rt);rt=setTimeout(()=>{let i=missions.findIndex(x=>x&&x.key===k);if(i>=0){mission=i;renderMission()}},120)}
 fileName.addEventListener('keydown',e=>{let c=cur();if(c&&(e.key==='Enter'||e.key==='Tab')&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e.preventDefault();go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')}},true);
-// Bunny / puppy rename is confirmed by Enter through the existing afV123 handler, not by typing the first letter.
+fileName.addEventListener('input',()=>{let c=cur(),v=fileName.value.trim().toLowerCase();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')&&v&&v!=='untitled')go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')},true);
 afV50PlayMissionHtml=()=>celebrate();
 const ug=updateGuideState;updateGuideState=function(){
 const r=ug.apply(this,arguments),c=cur(),animal=guideAnimal(c);
@@ -17697,6 +17741,18 @@ if(window.__auTabletMode){
   window.addEventListener('resize',positionCmdPanel143,{passive:true});
 
   function sendShortcut143(key){
+    if(key==='j'){
+      if(!selected || !selected.length)return;
+      const now=performance.now();
+      if(now-(window.__auLastCmdJExecV153||0)<540)return;
+      window.__auLastCmdJExecV153=now;
+      const copies=powerDuplicate(selected.slice());
+      if(copies&&copies.length){
+        if(m().key==='ctrlJ')next(document.documentElement.lang==='en'?'CMD+J duplicate complete!':'CMD+J 복제 성공!');
+        else celebrate(copies[0],document.documentElement.lang==='en'?'Duplicated!':'복제 완료!');
+      }
+      return;
+    }
     // Dispatch through the existing real shortcut path. This preserves its
     // history, clipboard, group IDs and mission-complete side effects.
     if(!cmdHeld143)setCmd143(true);
@@ -17827,6 +17883,171 @@ if(window.__auTabletMode){
   },true);
   window.__auIpadVirtualKeysV143={get cmd(){return cmdHeld143},get shift(){return !!keyState.shift},press:sendShortcut143};
 }
+
+
+/* AU_V153: iPad gesture stability, single CMD+J, and reliable Layer row selection. */
+(function(){
+  const isTablet=!!window.__auTabletMode;
+  const localEnglish=document.documentElement.lang.toLowerCase().startsWith('en');
+  const message=(ko,en)=>localEnglish?en:ko;
+
+  // Keep the existing PC resize pipeline exactly as it was.
+  const originalResizeV153=resizeSelection;
+  let sizingV153=false;
+  const originalBoxV153=renderBox;
+  renderBox=function(){
+    if(sizingV153)return;
+    return originalBoxV153.apply(this,arguments);
+  };
+
+  resizeSelection=function(event,handle){
+    if(!isTablet || !event || !['touch','pen'].includes(event.pointerType)){
+      return originalResizeV153.apply(this,arguments);
+    }
+    if(!selected||!selected.length)return;
+    if(event.cancelable)event.preventDefault();
+    event.stopPropagation();
+    const elements=selected.slice();
+    const begin=selectionBox(elements);
+    if(begin.width<=0||begin.height<=0)return;
+    const initial=elements.map(el=>({
+      el,left:el.offsetLeft,top:el.offsetTop,width:el.offsetWidth,height:el.offsetHeight
+    }));
+    const ar=art.getBoundingClientRect();
+    // PointerEvents report viewport CSS px; object offsets are artboard layout px.
+    const xScale=(art.offsetWidth||art.clientWidth||1)/Math.max(1,ar.width);
+    const yScale=(art.offsetHeight||art.clientHeight||1)/Math.max(1,ar.height);
+    const startX=event.clientX,startY=event.clientY;
+    const ratio=begin.width/Math.max(1,begin.height);
+    const id=event.pointerId;
+    const anchor=transformBox||art;
+    let changed=false;
+    let active=true;
+    sizingV153=true;
+    try{anchor.setPointerCapture(id);}catch(_e){}
+    // Do not rebuild the selection box while a finger owns its handle.
+    const live=transformBox;
+
+    function move(ev){
+      if(!active||ev.pointerId!==id)return;
+      if(ev.cancelable)ev.preventDefault();
+      const dx=(ev.clientX-startX)*xScale;
+      const dy=(ev.clientY-startY)*yScale;
+      if(Math.hypot(dx,dy)<1)return;
+      changed=true;
+      let left=begin.left,top=begin.top,width=begin.width,height=begin.height;
+      if(handle.includes('e'))width=begin.width+dx;
+      if(handle.includes('w')){width=begin.width-dx;left=begin.left+dx;}
+      if(handle.includes('s'))height=begin.height+dy;
+      if(handle.includes('n')){height=begin.height-dy;top=begin.top+dy;}
+      width=Math.max(18,width);height=Math.max(18,height);
+      if(isShift(ev)){
+        if(width/height>ratio)height=width/ratio;else width=height*ratio;
+        if(handle.includes('w'))left=begin.left+begin.width-width;
+        if(handle.includes('n'))top=begin.top+begin.height-height;
+      }
+      const sx=width/begin.width,sy=height/begin.height;
+      initial.forEach(item=>{
+        const el=item.el;
+        if(!el||!el.isConnected)return;
+        let l=left+(item.left-begin.left)*sx;
+        let t=top+(item.top-begin.top)*sy;
+        let w=Math.max(12,item.width*sx);
+        let h=Math.max(12,item.height*sy);
+        if(el.dataset.kind==='circle' && m().type==='silhouette'){
+          const snapped=previewSnap({left:l,top:t,width:w,height:h});
+          l=snapped.left;t=snapped.top;w=snapped.width;h=snapped.height;
+        }
+        el.style.left=Math.round(l)+'px';
+        el.style.top=Math.round(t)+'px';
+        el.style.width=Math.round(w)+'px';
+        el.style.height=Math.round(h)+'px';
+        if(el.dataset.kind==='star')el.style.fontSize=Math.max(28,Math.min(w,h)*.82)+'px';
+      });
+      if(live && live.isConnected){
+        live.style.left=left+'px';live.style.top=top+'px';
+        live.style.width=width+'px';live.style.height=height+'px';
+      }
+      coord.textContent='W:'+Math.round(width)+' / H:'+Math.round(height);
+    }
+    function end(ev){
+      if(!active||(ev&&ev.pointerId!==id))return;
+      active=false;
+      document.removeEventListener('pointermove',move,true);
+      document.removeEventListener('pointerup',end,true);
+      document.removeEventListener('pointercancel',cancel,true);
+      try{if(anchor.hasPointerCapture(id))anchor.releasePointerCapture(id);}catch(_e){}
+      sizingV153=false;
+      if(changed){
+        if(elements.length===1){
+          const el=elements[0],base=initial[0];
+          const step={dx:Math.round(el.offsetLeft-base.left),dy:Math.round(el.offsetTop-base.top),
+            dw:Math.round(el.offsetWidth-base.width),dh:Math.round(el.offsetHeight-base.height)};
+          if(step.dx||step.dy||step.dw||step.dh)lastPowerDuplicate=step;
+        }
+        elements.forEach(el=>{try{snapToGuide(el,'resize');}catch(_e){}});
+        try{clearHot();updateGuideState();}catch(_e){}
+        saveHistory();
+      }
+      renderBox();
+      if(!changed)return;
+      try{checkGuideDone();}catch(_e){}
+      const cur=m();
+      if(cur && ['resize','shapeResize','transform'].includes(cur.key)){
+        next(message('크기 조절 완료!','Resize complete!'));
+      }
+    }
+    function cancel(ev){
+      if(!active||ev.pointerId!==id)return;
+      changed=false;
+      end(ev);
+    }
+    document.addEventListener('pointermove',move,true);
+    document.addEventListener('pointerup',end,true);
+    document.addEventListener('pointercancel',cancel,true);
+  };
+
+  // A Safari tap can lose its synthetic click after Layer drag listeners run.
+  // Select on the real touch/pencil release instead, provided it did not move.
+  if(isTablet && layerList){
+    let touchLayer=null;
+    let ignoreNativeClickUntil=0;
+    let ignoreNativeKey='';
+    const pointerIsTouch=e=>e.pointerType==='touch'||e.pointerType==='pen';
+    layerList.addEventListener('pointerdown',e=>{
+      if(!pointerIsTouch(e)||e.isPrimary===false)return;
+      const el=e.target&&e.target.closest&&e.target.closest('.af-layer-item[data-layer-key]');
+      if(!el||e.target.closest('button,input,textarea,select'))return;
+      const key=el.dataset.layerKey;
+      if(!key||key==='artboard:main')return;
+      touchLayer={id:e.pointerId,key,x:e.clientX,y:e.clientY,at:performance.now()};
+    },true);
+    document.addEventListener('pointerup',e=>{
+      const tap=touchLayer;
+      if(!tap||!pointerIsTouch(e)||tap.id!==e.pointerId)return;
+      touchLayer=null;
+      if(performance.now()-tap.at>850||Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>13)return;
+      ignoreNativeClickUntil=performance.now()+650;
+      ignoreNativeKey=tap.key;
+      if(e.cancelable)e.preventDefault();
+      // Keep multi-select via CMD/SHIFT, but simple taps select just this layer.
+      const mode=e.shiftKey?'range':(e.metaKey||e.ctrlKey?'toggle':'plain');
+      afV81SelectLayerKey(tap.key,mode);
+    },true);
+    document.addEventListener('pointercancel',e=>{
+      if(touchLayer&&touchLayer.id===e.pointerId)touchLayer=null;
+    },true);
+    // Block the compatibility click that would otherwise toggle the row twice.
+    document.addEventListener('click',e=>{
+      if(performance.now()>ignoreNativeClickUntil||!e.isTrusted)return;
+      const row=e.target&&e.target.closest&&e.target.closest('#afLayerList .af-layer-item[data-layer-key]');
+      if(row && row.dataset.layerKey===ignoreNativeKey){
+        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+        ignoreNativeClickUntil=0;
+      }
+    },true);
+  }
+})();
 
 build();hideTips();btn();renderMission();guide(cur());
 })();
@@ -26395,6 +26616,61 @@ html.au-ipad-no-export #af-tutorial #afExport { display:none!important; }
   if(intro)intro.innerHTML='도형 만들기, 컬러, 스트로크, 레이어, 파일 이름 바꾸기까지<br>차근차근 먼저 익혀봐요.';
 })();
 </script>
+
+
+<!-- AU_V153_TOP_MENU_AND_TABLET_RESIZE_LAYER_FIX -->
+<style id="auV153InteractionStyle">
+/* A header popup must paint OVER objects and the entire artboard. */
+#af-tutorial .af-topbar{
+  position:relative!important;
+  z-index:120000!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+#af-tutorial .af-top-actions,
+#af-tutorial #afTopMenuZoneV46,
+#af-tutorial .af-top-menu-zone-v46{
+  position:relative!important;
+  z-index:120100!important;
+  overflow:visible!important;
+}
+#af-tutorial #afTopMenuZoneV46 .af-menu-wrap-v45.open,
+#af-tutorial #afTopMenuZoneV46 .af-menu-wrap-v45.open .af-menu-list-v45{
+  z-index:120200!important;
+}
+#af-tutorial .af-workspace{
+  position:relative!important;
+  z-index:1!important;
+}
+html.au-tablet-mode #af-tutorial #afLayerList .af-layer-item[data-layer-key]:not([data-layer-key="artboard:main"]){
+  touch-action:pan-y!important;
+  -webkit-tap-highlight-color:rgba(0,100,255,.14)!important;
+}
+html.au-tablet-mode #af-tutorial #afLayerList .af-layer-main-v54,
+html.au-tablet-mode #af-tutorial #afLayerList .af-layer-main-v48,
+html.au-tablet-mode #af-tutorial #afLayerList .af-layer-name{
+  pointer-events:auto!important;
+}
+/* 34px centered hit areas; the original corners stay visually anchored. */
+html.au-tablet-mode #af-tutorial .af-transform .af-handle{
+  box-sizing:border-box!important;
+  width:34px!important;height:34px!important;
+  min-width:34px!important;min-height:34px!important;
+  border:3px solid #1677ff!important;
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  pointer-events:auto!important;
+}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="nw"]{left:-17px!important;top:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="n"]{top:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="ne"]{right:-17px!important;top:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="e"]{right:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="se"]{right:-17px!important;bottom:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="s"]{bottom:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="sw"]{left:-17px!important;bottom:-17px!important}
+html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="w"]{left:-17px!important}
+</style>
 
 </body>
 </html>

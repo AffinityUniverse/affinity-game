@@ -4314,6 +4314,28 @@ body {
 }
 </style>
 
+<style id="au-ipad-card-bounds-v11">
+/* AU_IPAD_CARD_BOUNDS_V11: actual touch-tablet card width matches JS placement. */
+@media (min-width:821px) {
+  #affinityShortcutGame.au-touch-tablet .asg-game-area .asg-card {
+    box-sizing:border-box !important;
+    width:min(192px,calc(100% - 20px)) !important;
+    min-width:0 !important;
+    padding:7px !important;
+  }
+  #affinityShortcutGame.au-touch-tablet .asg-card-helper {
+    width:57px !important;height:57px !important;top:-47px !important;
+  }
+  #affinityShortcutGame.au-touch-tablet .asg-card-shortcut {
+    font-size:clamp(13px,1.65vw,17px) !important;
+    overflow-wrap:anywhere !important;
+  }
+  #affinityShortcutGame.au-touch-tablet .asg-card-name {
+    font-size:12px !important;
+    overflow-wrap:anywhere !important;
+  }
+}
+</style>
 </head>
 <body data-asg-build="AU-ASG-20260824-03">
 <div id="affinityShortcutGame" class="asg-ready" data-license-owner="AFFINITY-UNIVERSE" data-build-id="AU-ASG-20260824-03" data-build-fingerprint="771FF5FF8AD52CA7" data-distribution="protected">
@@ -4728,6 +4750,73 @@ body {
   let gameStartBuffer = null;
   let oneShotAudios = [];
 
+/* AU_IPAD_AUDIO_V11: predecode the actual bundled voice clips through WebAudio.
+   iPadOS Safari often rejects multiple recycled HTMLAudio.play() calls outside a
+   gesture; the unlocked AudioContext can play all subsequent clips reliably. */
+const auIpadClips = new Map();
+function auIsTouchAudio(){
+  return (typeof navigator!=='undefined' && (navigator.maxTouchPoints||0)>1) ||
+    !!(window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+}
+function auDecodeClip(src){
+  if(!src || typeof src!=='string' || !src.startsWith('data:audio/') || !audioCtx)return null;
+  const cached=auIpadClips.get(src);
+  if(cached)return cached;
+  const item={buffer:null,promise:null};
+  auIpadClips.set(src,item);
+  item.promise=new Promise(resolve=>{
+    let settled=false;
+    const done=buffer=>{if(settled)return;settled=true;item.buffer=buffer||null;resolve(item.buffer)};
+    try{
+      const raw=atob(src.slice(src.indexOf(',')+1));
+      const bytes=new Uint8Array(raw.length);
+      for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+      const pending=audioCtx.decodeAudioData(bytes.buffer,done,()=>done(null));
+      if(pending && typeof pending.then==='function')pending.then(done,()=>done(null));
+    }catch(error){done(null)}
+  });
+  return item;
+}
+function auPrimeIpadAudio(){
+  if(!auIsTouchAudio())return;
+  unlockAudio();
+  if(!audioCtx)return;
+  if(audioCtx.state!=='running'){
+    try{const p=audioCtx.resume();if(p&&p.catch)p.catch(()=>{})}catch(error){}
+  }
+  const sources=[GAME_START_VOICE_SRC,GAME_OVER_VOICE_SRC,LEVEL_UP_VOICE_SRC,SPEED_UP_VOICE_SRC,
+    GREAT_VOICE_SRC,GOOD_JOB_VOICE_SRC,EXCELLENT_VOICE_SRC,COMBO_VOICE_SRC,
+    WRONG_BEEP_VOICE_SRC,OH_NO_VOICE_SRC,
+    (typeof FART_VOICE_SRC==='string'?FART_VOICE_SRC:null),
+    (typeof MISSION_COMPLETE_VOICE_SRC==='string'?MISSION_COMPLETE_VOICE_SRC:null)];
+  for(const src of sources)if(src)auDecodeClip(src);
+}
+function auPlayIpadClip(src,volume=1,duckMs=0){
+  if(!auIsTouchAudio() || !src)return false;
+  unlockAudio();
+  if(!audioCtx)return false;
+  const entry=auDecodeClip(src);
+  if(!entry)return false;
+  const fire=buffer=>{
+    if(!buffer || !audioCtx)return;
+    if(audioCtx.state!=='running'){
+      try{const p=audioCtx.resume();if(p&&p.catch)p.catch(()=>{})}catch(error){}
+    }
+    try{
+      if(duckMs && typeof duckGameAudio==='function')duckGameAudio(duckMs);
+      const source=audioCtx.createBufferSource(),gain=audioCtx.createGain();
+      source.buffer=buffer;
+      gain.gain.value=Math.max(0,Math.min(1.6,volume));
+      source.connect(gain);gain.connect(audioCtx.destination);
+      source.start(0);
+    }catch(error){}
+  };
+  if(entry.buffer)fire(entry.buffer);
+  else if(entry.promise)entry.promise.then(fire);
+  return true;
+}
+
+
   function unlockAudio() {
     let resumePromise = Promise.resolve();
 
@@ -4851,6 +4940,8 @@ body {
       return false;
     }
 
+    if (auPlayIpadClip(audio.src || audio.currentSrc, volume == null ? 1 : volume, duckMs || 0)) return true;
+
     function attemptPlay() {
       try {
         duckGameAudio(duckMs || 900);
@@ -4895,6 +4986,7 @@ body {
       if (typeof onFail === "function") onFail();
       return false;
     }
+    if (auPlayIpadClip(src, volume == null ? 1 : volume, duckMs || 0)) return true;
     try {
       duckGameAudio(duckMs || 1200);
       const audio = new Audio(src);
@@ -5119,7 +5211,7 @@ body {
     state.wrongAudioTimers = [
       window.setTimeout(function () {
         if (performance.now() >= state.suppressWrongAudioUntil) soundFartLong();
-      }, 760)
+      }, 510)
     ];
   }
 
@@ -5130,7 +5222,7 @@ body {
     state.wrongAudioTimers = [
       window.setTimeout(function () {
         if (performance.now() >= state.suppressWrongAudioUntil) soundFartLong();
-      }, 760)
+      }, 510)
     ];
   }
 
@@ -5261,7 +5353,7 @@ body {
 
   function getBoostedGain(gainValue, limit) {
     const base = gainValue == null ? 0.08 : gainValue;
-    const duck = performance.now() < state.audioDuckUntil ? 0.12 : 1;
+    const duck = performance.now() < state.audioDuckUntil ? (auIsTouchAudio()?0.50:0.12) : 1;
     return Math.min(limit || 0.55, base * AUDIO_GAIN_MULTIPLIER * duck);
   }
 
@@ -5391,20 +5483,21 @@ body {
       const harmonyNote = harmony[state.bgmStep % harmony.length];
       const bassNote = bass[state.bgmStep % bass.length];
       const beat = state.bgmStep % 8;
+      const bgmBoost = auIsTouchAudio()?2.3:1;
 
       if (note > 0) {
-        playTone(note * levelPitch, 0.125, "square", 0.020, 0);
+        playTone(note * levelPitch, 0.125, "square", 0.020 * bgmBoost, 0);
         if (beat === 1 || beat === 5) {
-          playTone(note * 2 * levelPitch, 0.05, "triangle", 0.010, 0.05);
+          playTone(note * 2 * levelPitch, 0.05, "triangle", 0.010 * bgmBoost, 0.05);
         }
       }
 
       if (harmonyNote > 0 && (beat === 2 || beat === 6)) {
-        playTone(harmonyNote * levelPitch, 0.105, "triangle", 0.010, 0.018);
+        playTone(harmonyNote * levelPitch, 0.105, "triangle", 0.010 * bgmBoost, 0.018);
       }
 
       if (state.bgmStep % 2 === 0) {
-        playTone(bassNote * levelPitch, 0.095, "square", 0.012, 0.012);
+        playTone(bassNote * levelPitch, 0.095, "square", 0.012 * bgmBoost, 0.012);
       }
 
       if (state.bgmStep % 4 === 2) {
@@ -5994,7 +6087,8 @@ body {
       const other=state.cards.find(c=>!c.dead);
       x=other?(other.x<(left+right)/2?right:left):(Math.random()<.5?left:right);
     }
-    const y = isTouchShortcutMode() ? -48 : -150;
+    const auTabletSpawn = isTouchShortcutMode() && (navigator.maxTouchPoints||0)>1 && Math.max(window.innerWidth,window.innerHeight)>=960;
+    const y = auTabletSpawn ? 52 : (isTouchShortcutMode() ? -48 : -150);
     const config = getDifficultyConfig();
     const levelMultiplier = getLevelSpeedMultiplier();
     const speed = randomBetween(config.baseMinSpeed, config.baseMaxSpeed) * levelMultiplier;
@@ -6007,7 +6101,16 @@ body {
       <div class="asg-card-name">${data.name}</div>
     `;
     area.appendChild(el);
-    const card = { id: ++state.cardId, el, x, y, width: cardWidth, speed, combos: data.combos, label: data.label, name: data.name, dead: false, danger: false, revealAt: isTouchShortcutMode() ? performance.now() : null };
+    const actualCardWidth=Math.ceil(el.getBoundingClientRect().width || el.offsetWidth || cardWidth);
+    const cardInset=10;
+    const maxLeft=Math.max(cardInset,area.clientWidth-actualCardWidth-cardInset);
+    if (isTouchShortcutMode()) {
+      const other=state.cards.find(c=>!c.dead);
+      x=other ? (other.x < (cardInset+maxLeft)/2 ? maxLeft : cardInset)
+              : (Math.random()<.5 ? cardInset : maxLeft);
+    }
+    x=Math.max(cardInset,Math.min(maxLeft,x));
+    const card = { id: ++state.cardId, el, x, y, width: actualCardWidth, speed, combos: data.combos, label: data.label, name: data.name, dead: false, danger: false, revealAt: isTouchShortcutMode() ? performance.now() : null };
     state.cards.push(card);
     renderCard(card);
   }
@@ -6036,9 +6139,16 @@ body {
     state.cards.forEach(function (card) {
       if (!card || card.dead) return;
       const width = card.el ? card.el.getBoundingClientRect().width : (card.width||240);
-      card.x = Math.max(5, Math.min(card.x, maxWidth - width - 5));
+      const right=Math.max(8,maxWidth-width-8);
+      card.x = Math.max(8, Math.min(card.x, right));
       renderCard(card);
     });
+  }
+
+  if(window.ResizeObserver){
+    const auCardBoundsObserver=new ResizeObserver(()=>{if(state.cards.length)clampActiveCardsToArea()});
+    auCardBoundsObserver.observe(area);
+    asgController.signal.addEventListener('abort',()=>auCardBoundsObserver.disconnect(),{once:true});
   }
 
   function handleResponsiveResize() {
@@ -6727,6 +6837,8 @@ body {
 
     hideCenterMessage();
     area.querySelectorAll(".asg-floating-word").forEach(function (el) { el.remove(); });
+    // Last mistake also deserves its own audible wrong-answer effect on iPad.
+    if (auIsTouchAudio()) soundFartLong();
     // GAME OVER title is already rendered by makeGameOverDim(), just like the typing game.
     playGameOverVoice();
     makeStink(area.clientWidth / 2, area.clientHeight / 2, true);
@@ -6791,6 +6903,7 @@ body {
 
   function primeAudioFromUserGesture() {
     unlockAudio();
+    if (auIsTouchAudio()) { auPrimeIpadAudio(); return; }
     [levelUpAudio, gameOverAudio, comboAudio, greatAudio, excellentAudio, goodJobAudio,
       missionCompleteAudio, ohNoAudio, fartAudio, wrongBeepAudio, gameStartAudio].forEach(function (audio) {
       if (!audio) return;
@@ -6818,6 +6931,8 @@ body {
   document.addEventListener("touchstart", primeAudioFromUserGesture, { capture: true, once: true, passive: true, signal: asgController.signal });
   document.addEventListener("keydown", primeAudioFromUserGesture, { capture: true, once: true, signal: asgController.signal });
 
+  document.addEventListener("touchstart", auPrimeIpadAudio, {capture:true,passive:true,signal:asgController.signal});
+  document.addEventListener("pointerdown", auPrimeIpadAudio, {capture:true,passive:true,signal:asgController.signal});
   root.addEventListener("pointerdown", handleToolbarClick, { capture: true, signal: asgController.signal });
   root.addEventListener("touchstart", handleToolbarClick, { capture: true, passive: false, signal: asgController.signal });
   root.addEventListener("mousedown", handleToolbarClick, { capture: true, signal: asgController.signal });

@@ -952,6 +952,25 @@ html, body {
 @media(max-width:840px){#app .af-final-close-v58{top:10px;right:10px;width:32px;height:32px;min-width:32px;font-size:24px;}}
 </style>
 
+<style id="au-ipad-card-bounds-v11">
+/* AU_IPAD_CARD_BOUNDS_V11: tablet CSS and card placement use the same real width. */
+@media (min-width:821px) {
+  #app.au-touch-tablet .game .card {
+    box-sizing:border-box !important;
+    width:min(194px,calc(100% - 20px)) !important;
+    min-width:0 !important;
+    padding:7px !important;
+  }
+  #app.au-touch-tablet .game .card .helper {
+    width:57px !important;height:57px !important;top:-47px !important;
+  }
+  #app.au-touch-tablet .game .word {
+    font-size:clamp(16px,1.9vw,21px) !important;
+    overflow-wrap:anywhere !important;
+  }
+  #app.au-touch-tablet .game .hint {font-size:11px !important;overflow-wrap:anywhere !important;}
+}
+</style>
 </head>
 <body>
 <main class="app" id="app">
@@ -1091,9 +1110,78 @@ const WORDS = [
 const FALLBACK_CHARS=['🧒🏻','👧🏻','👦🏻','👧🏼','🧒🏽','👦🏼','👧🏽','🧒🏼','👦🏽','👧🏻','🧒🏻','👦🏻'];
 let CHARS=[];
 const $=s=>document.querySelector(s);
-const game=$('#game'), input=$('#typing'), scoreEl=$('#score'), comboEl=$('#combo'), livesEl=$('#lives'), levelStat=$('#levelStat'), levelTitle=$('#levelTitle'), levelDesc=$('#levelDesc'), progressText=$('#progressText'), progressFill=$('#progressFill'), ready=$('#ready'), language=$('#language'), difficulty=$('#difficulty'), category=$('#category'), liveText=$('#liveText'), zoneLabel=$('#zoneLabel'), playerName=$('#playerName'), chars=$('#characters'), pauseOverlay=$('#pauseOverlay'), rankingList=$('#rankingList'), reviewList=$('#reviewList'), reviewEmpty=$('#reviewEmpty');
+let input=$('#typing');
+const game=$('#game'), scoreEl=$('#score'), comboEl=$('#combo'), livesEl=$('#lives'), levelStat=$('#levelStat'), levelTitle=$('#levelTitle'), levelDesc=$('#levelDesc'), progressText=$('#progressText'), progressFill=$('#progressFill'), ready=$('#ready'), language=$('#language'), difficulty=$('#difficulty'), category=$('#category'), liveText=$('#liveText'), zoneLabel=$('#zoneLabel'), playerName=$('#playerName'), chars=$('#characters'), pauseOverlay=$('#pauseOverlay'), rankingList=$('#rankingList'), reviewList=$('#reviewList'), reviewEmpty=$('#reviewEmpty');
 let state={running:false,paused:false,score:0,combo:0,lives:5,level:1,correctInLevel:0,correctTotal:0,cards:[],last:0,spawn:0,selected:0,recentWords:[],bestCombo:0,mistakes:{},bgmTimer:null,bgmStep:0};
+const FART_VOICE_SRC="data:audio/mpeg;base64,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";
 let audioCtx=null;
+
+/* AU_IPAD_AUDIO_V11: predecode the actual bundled voice clips through WebAudio.
+   iPadOS Safari often rejects multiple recycled HTMLAudio.play() calls outside a
+   gesture; the unlocked AudioContext can play all subsequent clips reliably. */
+const auIpadClips = new Map();
+function auIsTouchAudio(){
+  return (typeof navigator!=='undefined' && (navigator.maxTouchPoints||0)>1) ||
+    !!(window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+}
+function auDecodeClip(src){
+  if(!src || typeof src!=='string' || !src.startsWith('data:audio/') || !audioCtx)return null;
+  const cached=auIpadClips.get(src);
+  if(cached)return cached;
+  const item={buffer:null,promise:null};
+  auIpadClips.set(src,item);
+  item.promise=new Promise(resolve=>{
+    let settled=false;
+    const done=buffer=>{if(settled)return;settled=true;item.buffer=buffer||null;resolve(item.buffer)};
+    try{
+      const raw=atob(src.slice(src.indexOf(',')+1));
+      const bytes=new Uint8Array(raw.length);
+      for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+      const pending=audioCtx.decodeAudioData(bytes.buffer,done,()=>done(null));
+      if(pending && typeof pending.then==='function')pending.then(done,()=>done(null));
+    }catch(error){done(null)}
+  });
+  return item;
+}
+function auPrimeIpadAudio(){
+  if(!auIsTouchAudio())return;
+  unlockAudio();
+  if(!audioCtx)return;
+  if(audioCtx.state!=='running'){
+    try{const p=audioCtx.resume();if(p&&p.catch)p.catch(()=>{})}catch(error){}
+  }
+  const sources=[GAME_START_VOICE_SRC,GAME_OVER_VOICE_SRC,LEVEL_UP_VOICE_SRC,SPEED_UP_VOICE_SRC,
+    GREAT_VOICE_SRC,GOOD_JOB_VOICE_SRC,EXCELLENT_VOICE_SRC,COMBO_VOICE_SRC,
+    WRONG_BEEP_VOICE_SRC,OH_NO_VOICE_SRC,
+    (typeof FART_VOICE_SRC==='string'?FART_VOICE_SRC:null),
+    (typeof MISSION_COMPLETE_VOICE_SRC==='string'?MISSION_COMPLETE_VOICE_SRC:null)];
+  for(const src of sources)if(src)auDecodeClip(src);
+}
+function auPlayIpadClip(src,volume=1,duckMs=0){
+  if(!auIsTouchAudio() || !src)return false;
+  unlockAudio();
+  if(!audioCtx)return false;
+  const entry=auDecodeClip(src);
+  if(!entry)return false;
+  const fire=buffer=>{
+    if(!buffer || !audioCtx)return;
+    if(audioCtx.state!=='running'){
+      try{const p=audioCtx.resume();if(p&&p.catch)p.catch(()=>{})}catch(error){}
+    }
+    try{
+      if(duckMs && typeof duckGameAudio==='function')duckGameAudio(duckMs);
+      const source=audioCtx.createBufferSource(),gain=audioCtx.createGain();
+      source.buffer=buffer;
+      gain.gain.value=Math.max(0,Math.min(1.6,volume));
+      source.connect(gain);gain.connect(audioCtx.destination);
+      source.start(0);
+    }catch(error){}
+  };
+  if(entry.buffer)fire(entry.buffer);
+  else if(entry.promise)entry.promise.then(fire);
+  return true;
+}
+
 let animationGeneration=0;
 const OH_NO_VOICE_SRC="data:audio/mpeg;base64,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";
 const GREAT_VOICE_SRC="data:audio/mpeg;base64,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";
@@ -1128,7 +1216,7 @@ const BUILTIN_SHORTCUT_CHARACTERS=[{"name":"그린","src":"data:image/png;base64
 function unlockAudio(){
   try{
     if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    if(audioCtx.state==='suspended')audioCtx.resume();
+    if(audioCtx.state!=='running'){const p=audioCtx.resume();if(p&&p.catch)p.catch(()=>{});}
     if(!ohNoAudio&&OH_NO_VOICE_SRC){
       ohNoAudio=new Audio(OH_NO_VOICE_SRC);
       ohNoAudio.preload='auto';
@@ -1158,10 +1246,10 @@ function startBgm(){
   const bass=[131,131,196,196,174,174,220,220,147,147,196,196,165,165,196,196,131,131,196,196,220,220,247,247,147,147,196,196,131,131,196,196];
   function tick(){
     if(!state.running||state.paused)return;
-    const levelPitch=1+Math.min(.20,(state.level-1)*.021),note=melody[state.bgmStep%melody.length],harmonyNote=harmony[state.bgmStep%harmony.length],bassNote=bass[state.bgmStep%bass.length],beat=state.bgmStep%8;
-    if(note>0){tone(note*levelPitch,0,.125,'square',.020);if(beat===1||beat===5)tone(note*2*levelPitch,.05,.05,'triangle',.010)}
+    const levelPitch=1+Math.min(.20,(state.level-1)*.021),note=melody[state.bgmStep%melody.length],harmonyNote=harmony[state.bgmStep%harmony.length],bassNote=bass[state.bgmStep%bass.length],beat=state.bgmStep%8,bgmBoost=auIsTouchAudio()?2.5:1;
+    if(note>0){tone(note*levelPitch,0,.125,'square',.020*bgmBoost);if(beat===1||beat===5)tone(note*2*levelPitch,.05,.05,'triangle',.010*bgmBoost)}
     if(harmonyNote>0&&(beat===2||beat===6))tone(harmonyNote*levelPitch,.018,.105,'triangle',.010);
-    if(state.bgmStep%2===0)tone(bassNote*levelPitch,.012,.095,'square',.012);
+    if(state.bgmStep%2===0)tone(bassNote*levelPitch,.012,.095,'square',.012*bgmBoost);
     if(state.bgmStep%4===2)playNoise(.013,.026,.006,'highpass',2400);
     state.bgmStep++;
   }
@@ -1180,27 +1268,18 @@ function soundButtonClick(){
 }
 function playFartVoice(){
   unlockAudio();
-  try{
-    const a=new Audio(FART_VOICE_SRC);
-    a.preload='auto';
-    a.playsInline=true;
-    a.volume=.55;
-    a.playbackRate=.92+Math.random()*.16;
-    const p=a.play();
-    if(p&&p.catch)p.catch(()=>{});
-  }catch(e){
-    playVoice(FART_VOICE_SRC,.55);
-  }
+  if(auPlayIpadClip(FART_VOICE_SRC,.67))return;
+  playVoice(FART_VOICE_SRC,.67);
 }
 function soundFartLong(){playFartVoice()}
 function playWrongKeySound(){
   stopPraiseVoices();
   playVoice(WRONG_BEEP_VOICE_SRC,1);
-  setTimeout(()=>soundFartLong(),760);
+  setTimeout(()=>soundFartLong(),490);
 }
 function playMissedCardSound(){
   playOhNo();
-  setTimeout(()=>soundFartLong(),760);
+  setTimeout(()=>soundFartLong(),490);
 }
 function gameOverSound(){
   unlockAudio();
@@ -1213,6 +1292,7 @@ const voiceCache={};
 function playVoice(src,volume=1){
   if(!src)return;
   unlockAudio();
+  if(auPlayIpadClip(src,volume))return;
   try{
     let a=voiceCache[src];
     if(!a){a=new Audio(src);a.preload='auto';a.playsInline=true;voiceCache[src]=a}
@@ -1245,6 +1325,7 @@ function playGameStartVoice(){playVoice(GAME_START_VOICE_SRC,1)}
 
 function playOhNo(){
   unlockAudio();
+  if(auPlayIpadClip(OH_NO_VOICE_SRC,.72))return;
   if(ohNoAudio){try{ohNoAudio.pause();ohNoAudio.currentTime=0;const p=ohNoAudio.play();if(p&&p.catch)p.catch(()=>{});return}catch(e){}}
   try{if(window.speechSynthesis&&window.SpeechSynthesisUtterance){const u=new SpeechSynthesisUtterance('Oh no!');u.lang='en-US';u.rate=.95;u.pitch=1.1;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}}catch(e){}
 }
@@ -1393,7 +1474,8 @@ function selectedCharacter(){return CHARS[state.selected]||CHARS[0]||{name:'캐�
 function getRandomCharacter(){return CHARS.length?CHARS[Math.floor(Math.random()*CHARS.length)]:selectedCharacter()}
 function helperMarkup(ch){return characterMarkup(ch||selectedCharacter())}
 
-function spawnCard(){if(!state.running||state.paused)return;if(isMobileTypingMode()&&state.cards.length>=2)return;const p=currentPool();if(!p.length)return;const data=p[Math.floor(Math.random()*p.length)];rememberWord(data.word);const helperChar=getRandomCharacter(),el=document.createElement('div');el.className='card';el.innerHTML=`<div class="helper">${helperMarkup(helperChar)}</div><div class="wordbox"><div class="word">${data.word}</div></div><div class="hint">${categoryName(data.cat)}</div>`;game.appendChild(el);const width=isMobileTypingMode()?Math.min(156,Math.max(116,game.clientWidth-16)):(window.innerWidth<700?190:230);let x=isMobileTypingMode()?8:(16+Math.random()*Math.max(20,game.clientWidth-width-32));if(isMobileTypingMode()){const left=8,right=Math.max(left,game.clientWidth-width-8),other=state.cards[0];x=other?(other.x<(left+right)/2?right:left):(Math.random()<.5?left:right);}const speed=(config().speed+Math.random()*9)*speedMultiplier()*(isMobileTypingMode()?.5:1);const card={el,word:data.word,x,y:isMobileTypingMode()?-48:-145,speed,danger:false,revealAt:isMobileTypingMode()?performance.now():null};state.cards.push(card);renderCard(card)}
+function spawnCard(){if(!state.running||state.paused)return;if(isMobileTypingMode()&&state.cards.length>=2)return;const p=currentPool();if(!p.length)return;const data=p[Math.floor(Math.random()*p.length)];rememberWord(data.word);const helperChar=getRandomCharacter(),el=document.createElement('div');el.className='card';el.innerHTML=`<div class="helper">${helperMarkup(helperChar)}</div><div class="wordbox"><div class="word">${data.word}</div></div><div class="hint">${categoryName(data.cat)}</div>`;game.appendChild(el);const width=Math.ceil(el.getBoundingClientRect().width||el.offsetWidth||230);let x=isMobileTypingMode()?8:(16+Math.random()*Math.max(20,game.clientWidth-width-32));if(isMobileTypingMode()){const left=8,right=Math.max(left,game.clientWidth-width-8),other=state.cards[0];x=other?(other.x<(left+right)/2?right:left):(Math.random()<.5?left:right);}x=Math.max(8,Math.min(x,Math.max(8,game.clientWidth-width-8)));
+const speed=(config().speed+Math.random()*9)*speedMultiplier()*(isMobileTypingMode()?.5:1);const card={el,word:data.word,x,y:(isMobileTypingMode()&&(navigator.maxTouchPoints||0)>1&&Math.max(window.innerWidth,window.innerHeight)>=960)?52:(isMobileTypingMode()?-48:-145),speed,danger:false,revealAt:isMobileTypingMode()?performance.now():null};state.cards.push(card);renderCard(card)}
 function renderCard(c){
   c.el.style.transform=`translate3d(${c.x}px,${c.y}px,0)`;
   // Opacity eases in while the card moves at an unchanged velocity.
@@ -1605,7 +1687,7 @@ function hit(c){
   state.correctTotal++;
   state.correctInLevel++;
   state.score+=10+Math.min(60,state.combo*2)+state.level*2;
-  input.value='';
+  clearMatchedTypingInput();
   liveText.textContent='정답!';
 
   const levelCleared=state.correctInLevel>=10;
@@ -1717,6 +1799,7 @@ function endGame(){
   const pb=$('#pauseBtn');pb.textContent='일시정지';pb.classList.remove('resume-active');
   if(pauseOverlay)pauseOverlay.classList.remove('show');
   state.running=false;state.paused=false;input.disabled=true;
+  if(auIsTouchAudio())soundFartLong();
   gameOverSound();playGameOverVoice();
   $('#startBtn').disabled=false;$('#pauseBtn').disabled=true;
   saveCurrentRanking();renderReview();$('#resultPanels')?.classList.add('show');
@@ -1727,18 +1810,86 @@ function endGame(){
   scheduleFinalNextGame(false,4050);
 }
 
-input.addEventListener('input',()=>{liveText.textContent=input.value||'-';const v=norm(input.value);if(!v||!state.running||state.paused)return;const match=state.cards.filter(c=>norm(c.word)===v).sort((a,b)=>b.y-a.y)[0];if(match)hit(match)});
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&norm(input.value)&&state.running&&!state.paused){const match=state.cards.some(c=>norm(c.word)===norm(input.value));if(!match){recordMistake(input.value);playWrongKeySound();game.classList.remove('shake');void game.offsetWidth;game.classList.add('shake');makeStink(game.clientWidth/2,game.clientHeight-95,false);state.combo=0;comboEl.textContent=0;liveText.textContent='다시 입력!';input.value=''}}});
+/* Korean IME: prevent a still-composing final syllable from being committed
+   to the NEXT answer on Windows Chrome / Edge.  Checking
+   complete Hangul words during composition is intentional (no Enter needed). */
+let koreanComposing = false;
+function evaluateTypedWord(){
+  liveText.textContent=input.value||'-';
+  if(!state.running||state.paused)return;
+  const value=norm(input.value);
+  if(!value)return;
+  const match=state.cards.filter(c=>norm(c.word)===value).sort((a,b)=>b.y-a.y)[0];
+  if(match)hit(match);
+}
+function bindTypingInputEvents(target){
+  target.addEventListener('compositionstart',()=>{
+    if(target===input)koreanComposing=true;
+  });
+  target.addEventListener('compositionend',()=>{
+    // Old IME events can still arrive after a successful Korean answer.
+    if(target!==input)return;
+    koreanComposing=false;
+    evaluateTypedWord();
+  });
+  target.addEventListener('input',()=>{
+    if(target!==input)return;
+    // Do NOT wait for compositionend: a Windows Hangul IME may leave the
+    // final syllable composing until an extra Space/Enter/letter is pressed.
+    evaluateTypedWord();
+  });
+  target.addEventListener('keydown',e=>{
+    if(target!==input)return;
+    if(e.key==='Enter'&&!e.isComposing&&!koreanComposing&&e.keyCode!==229&&
+       norm(input.value)&&state.running&&!state.paused){
+      const hasMatch=state.cards.some(c=>norm(c.word)===norm(input.value));
+      if(!hasMatch){
+        recordMistake(input.value);playWrongKeySound();
+        game.classList.remove('shake');void game.offsetWidth;game.classList.add('shake');
+        makeStink(game.clientWidth/2,game.clientHeight-95,false);
+        state.combo=0;comboEl.textContent=0;liveText.textContent='다시 입력!';
+        input.value='';
+      }
+    }
+  });
+}
+function clearMatchedTypingInput(){
+  const oldInput=input;
+  const wasFocused=document.activeElement===oldInput;
+  oldInput.value='';
+  // A desktop Korean IME can keep its last syllable in its composition
+  // buffer even when input.value is empty. Destroying just the old input
+  // node cancels that buffer. A late event only affects the OLD node.
+  // Keep the node on iOS/Android/iPadOS touch devices: replacing it could
+  // close their software keyboards. Windows touchscreen laptops still reset.
+  const isWindowsComputer=typeof navigator!=='undefined' && /Windows/i.test(navigator.userAgent||'');
+  if(language.value==='ko'&&(isWindowsComputer||!isMobileTypingMode())){
+    const cleanInput=oldInput.cloneNode(false);
+    cleanInput.value='';
+    cleanInput.removeAttribute('value');
+    input=cleanInput; // stale events on oldInput are ignored
+    oldInput.replaceWith(cleanInput);
+    koreanComposing=false;
+    bindTypingInputEvents(cleanInput);
+    if(wasFocused&&state.running&&!state.paused){
+      try{cleanInput.focus({preventScroll:true})}catch(_){cleanInput.focus()}
+    }
+  }else{
+    koreanComposing=false;
+  }
+}
+bindTypingInputEvents(input);
 
 function clearCards(){clearReferencePraise();state.cards.forEach(c=>c.el.remove());state.cards=[];game.querySelectorAll('.gameover,.praise,.spark,.asg-hit-fx-layer,.asg-stink,.asg-heart-pop,.asg-shard').forEach(x=>x.remove())}
 function start(autoFullscreen=true,playClick=true){
   state.rankSaved=false;
+  koreanComposing=false;
   state.activeCharacterIndex=state.selected;
   state.activeCharacter={...selectedCharacter()};
   state.runId='run-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
   const generation=++animationGeneration;
   $('#app').classList.remove('typing-ended');$('#app').classList.add('typing-in-game');unlockAudio();if(playClick)soundButtonClick();if(autoFullscreen&&!isMobileTypingMode())enterGameFullscreen();hideFinalNextGame();clearCards();if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');const pb=$('#pauseBtn');pb.textContent='일시정지';pb.classList.remove('resume-active');state.running=true;state.paused=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.spawn=0;state.last=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};input.disabled=false;input.value='';ready.classList.add('hide');$('#startBtn').disabled=true;$('#pauseBtn').disabled=false;language.disabled=true;difficulty.disabled=true;category.disabled=true;playerName.disabled=true;updateUI();try{input.focus({preventScroll:true})}catch(_){input.focus()}playGameStartVoice();floatingWord('GAME START!','combo-big-word');spawnCard();startBgm();requestAnimationFrame(t=>loop(t,generation))}
-function reset(){animationGeneration++;$('#app').classList.remove('typing-in-game','typing-ended');hideFinalNextGame();stopBgm();state.running=false;state.paused=false;if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');clearCards();input.disabled=true;input.value='';ready.classList.remove('hide');$('#startBtn').disabled=false;$('#pauseBtn').disabled=true;$('#pauseBtn').textContent='일시정지';$('#pauseBtn').classList.remove('resume-active');language.disabled=false;difficulty.disabled=false;category.disabled=false;playerName.disabled=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};renderReview();updateUI()}
+function reset(){animationGeneration++;koreanComposing=false;$('#app').classList.remove('typing-in-game','typing-ended');hideFinalNextGame();stopBgm();state.running=false;state.paused=false;if(pauseOverlay)pauseOverlay.classList.remove('show');$('#resultPanels')?.classList.remove('show');clearCards();input.disabled=true;input.value='';ready.classList.remove('hide');$('#startBtn').disabled=false;$('#pauseBtn').disabled=true;$('#pauseBtn').textContent='일시정지';$('#pauseBtn').classList.remove('resume-active');language.disabled=false;difficulty.disabled=false;category.disabled=false;playerName.disabled=false;state.score=0;state.combo=0;state.lives=5;state.level=1;state.correctInLevel=0;state.correctTotal=0;state.recentWords=[];state.bestCombo=0;state.mistakes={};renderReview();updateUI()}
 function restart(){soundButtonClick();reset();start(false,false)}
 function pause(){if(!state.running)return;soundButtonClick();const pb=$('#pauseBtn');if(!state.paused){state.paused=true;pb.textContent='계속하기';pb.classList.add('resume-active');input.disabled=true;if(pauseOverlay)pauseOverlay.classList.add('show');stopBgm()}else{state.paused=false;pb.textContent='일시정지';pb.classList.remove('resume-active');input.disabled=false;if(pauseOverlay)pauseOverlay.classList.remove('show');input.focus();startBgm()}}
 function loop(t,generation){
@@ -1782,8 +1933,40 @@ input.setAttribute('autocorrect','off');
 
 $('#typingFinalReplayBtn')?.addEventListener('click',restart);
 $('#typingFinalCloseBtn')?.addEventListener('click',closeFinalAndShowRankings);
-$('#startBtn').onclick=()=>start(true,true);$('#resetBtn').onclick=restart;$('#pauseBtn').onclick=pause;$('#fullBtn').onclick=async()=>{if(isMobileTypingMode())return;soundButtonClick();const app=$('#app');try{if(!document.fullscreenElement)await app.requestFullscreen?.();else await document.exitFullscreen?.()}catch(e){}syncFullscreenButton()};document.addEventListener('fullscreenchange',syncFullscreenButton);syncFullscreenButton();
-language.onchange=updateUI;category.onchange=updateUI;window.addEventListener('resize',()=>state.cards.forEach(c=>{c.x=Math.min(c.x,game.clientWidth-210);renderCard(c)}));
+document.addEventListener('pointerdown',auPrimeIpadAudio,{capture:true,passive:true});
+document.addEventListener('touchstart',auPrimeIpadAudio,{capture:true,passive:true});
+$('#startBtn').onclick=()=>{auPrimeIpadAudio();start(true,true)};$('#resetBtn').onclick=restart;$('#pauseBtn').onclick=pause;$('#fullBtn').onclick=async()=>{if(isMobileTypingMode())return;soundButtonClick();const app=$('#app');try{if(!document.fullscreenElement)await app.requestFullscreen?.();else await document.exitFullscreen?.()}catch(e){}syncFullscreenButton()};document.addEventListener('fullscreenchange',syncFullscreenButton);syncFullscreenButton();
+language.onchange=()=>{updateUI();syncLanguageToUrl()};category.onchange=updateUI;function auClampTypingCardBounds(){
+  state.cards.forEach(c=>{
+    const width=Math.ceil(c.el.getBoundingClientRect().width||c.el.offsetWidth||230);
+    c.x=Math.max(8,Math.min(c.x,Math.max(8,game.clientWidth-width-8)));
+    renderCard(c);
+  });
+}
+window.addEventListener('resize',auClampTypingCardBounds);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',auClampTypingCardBounds);
+if(window.ResizeObserver)(new ResizeObserver(auClampTypingCardBounds)).observe(game);
+// Direct links can preselect the word pool without starting the game.
+// Examples: typinggame.html?lang=en, typinggame_en.html?lang=ko
+function applyLanguageFromUrl(){
+  const requested=(new URLSearchParams(window.location.search).get('lang')||'').trim().toLowerCase();
+  const normalized=requested==='korean'?'ko':requested==='english'?'en':requested;
+  if((normalized==='ko'||normalized==='en') &&
+     Array.from(language.options).some(option=>option.value===normalized)){
+    language.value=normalized;
+  }
+}
+function syncLanguageToUrl(){
+  // Keep the current mode shareable after selecting a different language.
+  // Replace the current history entry; do not navigate or reset a game.
+  try{
+    const url=new URL(window.location.href);
+    url.searchParams.set('lang',language.value);
+    window.history.replaceState(window.history.state,'',url.href);
+  }catch(_){ /* Some embedded/file contexts may forbid history changes. */ }
+}
+
+applyLanguageFromUrl();
 setShortcutCharacters(BUILTIN_SHORTCUT_CHARACTERS);
 renderRankings();renderReview();updateUI();
 </script>
