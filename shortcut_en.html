@@ -9072,5 +9072,28 @@ body { display:block !important; min-height:100vh !important; background:#0b1328
 #app .game .au-ending-persistent-v15 > .au-ending-next-v15,
 #affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > .au-ending-next-v15 {display:none !important;}
 </style>
+
+<style id="auGameOverRedGlowV17">
+/* Only the GAME OVER title turns red-glowing. Letter shapes stay white;
+   FINISH! and MISSION COMPLETE! keep their existing blue glow. */
+#app .game .gameover.au-ending-persistent-v15:not(.complete) > strong,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > strong {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  -webkit-text-stroke:0 transparent !important;
+  text-shadow:0 0 5px rgba(255,255,255,.90),
+              0 0 16px rgba(255,74,105,.96),
+              0 0 33px rgba(236,24,64,.79) !important;
+}
+/* GAME OVER is an SVG on current builds, so CSS text-shadow alone
+   cannot reach its white vector lettering. */
+#app .game .gameover.au-ending-persistent-v15:not(.complete) > strong.au-cue-vector-v6 > svg,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > strong.au-cue-vector-v6 > svg {
+  fill:#ffffff !important;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,.90))
+         drop-shadow(0 0 13px rgba(255,74,105,.95))
+         drop-shadow(0 0 22px rgba(236,24,64,.75)) !important;
+}
+</style>
 </body>
 </html>
