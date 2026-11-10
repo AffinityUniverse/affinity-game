@@ -84,15 +84,10 @@ html.au-phone-blocked #auPhoneGateV136{
     const tag=((e.target&&e.target.tagName)||'').toLowerCase();
     const isI=e.code==='KeyI'||e.key==='i'||e.key==='I';
     if(!isI)return;
-    if(tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable))return;
-    if(tag==='input'){
-      if(e.target&&e.target.id==='afFileName'){
-        const mt=document.getElementById('afMissionTitle');
-        const title=(mt&&mt.textContent)||'';
-        if(/파일\s*이름|이름\s*바꾸기/.test(title))return;
-        try{e.target.blur();}catch(_e){}
-      }else return;
-    }
+    // AU_V154: Editing a filename or any other text field must win over
+    // the I/eyedropper shortcut, regardless of the current mission title.
+    if(tag==='input'||tag==='textarea'||tag==='select'||
+       (e.target&&e.target.isContentEditable)||e.isComposing)return;
     if(!isI||e.metaKey||e.ctrlKey||e.altKey)return;
     if(typeof window.__afToggleEyedropperV43!=='function')return;
     e.preventDefault();
@@ -128,7 +123,7 @@ html.au-phone-blocked #auPhoneGateV136{
   font-family: 'LaundryGothic', sans-serif !important;
 }
 </style>
-<div id="af-tutorial" data-au-owner="AFFINITY-UNIVERSE" data-au-build="AU-TUT-20260824-02" data-au-fingerprint="B640BFCA817E5101" data-au-distribution="protected" class="laundry-gothic af-v125-intro-open" style="font-family:'LaundryGothic',sans-serif;"><div class="af-start" id="afStart"><div class="af-start-card"><div class="af-start-badge">AFFINITY UNIVERSE</div><h2>Mini Designer Tutorial</h2><p>도형 만들기, 컬러, 스트로크, 레이어, Export PNG까지<br>차근차근 먼저 익혀봐요.</p><button type="button" id="afStartBtn">디자이너 되어보기</button></div></div><div class="af-toast" id="afToast">Good Job!</div><div class="af-app"><header class="af-topbar"><section class="af-mission-top" id="afMissionCard"><div class="af-mission-kicker"><span>TODAY MISSION</span><b id="afMissionStep">1 / 24</b></div><div class="af-mission-body"><strong id="afMissionTitle">파일 이름 바꾸기</strong><span id="afMissionDesc">상단의 Untitled를 눌러 원하는 이름으로 바꿔보세요.</span></div></section><div class="af-top-actions"><button type="button" class="af-export" id="afExport">Export PNG</button></div></header><div class="af-workspace"><aside class="af-toolbar"><button type="button" class="af-tool active" data-tool="move" id="afMoveTool" title="Move Tool (V)"><svg viewBox="0 0 32 32"><path d="M7 3 L23 18 L15.5 18.8 L19.5 27.5 L15.6 29.2 L11.6 20.5 L7 26 Z" fill="#050505" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button><div class="af-shape-wrap"><button type="button" class="af-tool" data-tool="shape" id="afShapeTool" title="Shape Tool (U)"><span id="afShapeIcon" class="af-icon af-icon-rect"></span></button><div class="af-shape-menu" id="afShapeMenu"><button type="button" data-shape="rect"><span class="af-icon af-icon-rect"></span></button><button type="button" data-shape="circle"><span class="af-icon af-icon-circle"></span></button><button type="button" data-shape="round"><span class="af-icon af-icon-round"></span></button><button type="button" data-shape="triangle"><span class="af-icon af-icon-triangle"></span></button><button type="button" data-shape="star">★</button></div></div><div class="af-mini-targets"><button type="button" id="afMiniFill" class="active"></button><button type="button" id="afMiniStroke"></button></div></aside><main class="af-main"><div class="af-docbar"><input id="afFileName" type="text" value="Untitled" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" draggable="false"><span>@ 71%</span><em>V 무브툴 / U 도형툴 / ctrl(command)+Z / ctrl(command)+shift+Z / ctrl(command)+C,V / ctrl(command)+J / ctrl(command)+shift 드래그 / ctrl(command)+G / ctrl(command)+shift+G / 레이어 순서 단축키는 cmd(ctrl)+[ ], cmd(ctrl)+shift+[ ] 사용</em></div><div class="af-stage"><div class="af-artboard-wrap"><div class="af-artboard-label">Artboard1</div><div class="af-artboard" id="afArtboard"><div class="af-empty" id="afEmpty">도형 도구를 선택한 뒤<br>흰색 Artboard에서 드래그해보세요.</div><div class="af-drag-guide" id="afDragGuide"><strong>드래그란?</strong><span>마우스를 누른 채 움직이고 원하는 위치에서 손을 떼는 동작이에요.</span><i></i></div><div class="af-guide-overlay" id="afGuideOverlay"></div></div></div></div><div class="af-bottombar"><div><strong id="afStatusStrong">Ready</strong><span id="afStatusText">튜토리얼을 시작해보세요.</span></div><div><span id="afSelectionInfo">No Selection</span><span id="afCoord">X:0 / Y:0</span></div></div></main><aside class="af-sidebar"><section class="af-panel af-top-panel"><div class="af-tabs"><button type="button" class="active" data-panel="colour">Colour</button><button type="button" data-panel="stroke">Stroke</button></div><div class="af-tab-body active" id="afColourPanel"><div class="af-colour-topline"><div class="af-colour-targets"><button type="button" id="afBigFill" class="active" title="면 색상"></button><button type="button" id="afBigStroke" title="선 색상"></button><button type="button" id="afNoColor" title="색상 없음"></button><button type="button" id="afEyedropperV41" class="af-eyedropper-v41" title="스포이드 (I) · 색상 가져오기" aria-label="스포이드" aria-pressed="false"><svg viewBox="0 0 36 36" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22.4 4.5a4.8 4.8 0 0 1 6.8 0l2.3 2.3a4.8 4.8 0 0 1 0 6.8l-4.2 4.2-9.1-9.1 4.2-4.2Z"/><path d="M21.5 11.7 9.7 23.5a5.3 5.3 0 0 0-1.4 2.5l-.9 3.4 3.4-.9a5.3 5.3 0 0 0 2.5-1.4l11.8-11.8"/><path d="m8.7 24.6 2.7 2.7"/></svg></button><button type="button" id="afEyedropperSampleV41" class="af-eyedropper-sample-v41" title="추출한 색상을 도형에 적용" aria-label="추출한 색상 적용"></button></div><div class="af-colour-hexbox"><span>#:</span><b id="afHexText">EBEBEB</b></div></div><div class="af-wheel-wrap"><div class="af-wheel-stage" id="afWheelStage"><canvas id="afWheelCanvas" width="290" height="290"></canvas><button type="button" id="afHuePointer" class="af-wheel-pointer af-hue-pointer" aria-label="Hue pointer"></button><button type="button" id="afTriPointer" class="af-wheel-pointer af-tri-pointer" aria-label="Triangle pointer"></button></div></div><label class="af-range"><span>Opacity</span><input type="range" id="afOpacity" min="0" max="100" value="100"><b id="afOpacityText">100%</b></label></div><div class="af-tab-body" id="afStrokePanel"><div class="af-stroke-row"><span>Style</span><button type="button" class="active" data-stroke-style="none">None</button><button type="button" data-stroke-style="solid">Solid</button><button type="button" data-stroke-style="dotted">Dot</button></div><label class="af-range"><span>Width</span><input type="range" id="afStrokeWidth" min="0" max="30" value="0"><b id="afStrokeText">0pt</b></label></div></section><section class="af-panel af-layer-panel"><div class="af-layer-head"><div><strong>Layers</strong></div></div><div class="af-artboard-persistent-wrap-v10"><button type="button" id="afPersistentArtboardRowV10" class="af-persistent-artboard-row-v10" aria-expanded="true"><span class="af-persistent-arrow-v10">▾</span><span class="af-persistent-thumb-v10" aria-hidden="true"></span><span class="af-persistent-name-v10">Artboard1</span><span class="af-persistent-count-v10">0 layers</span></button></div><div class="af-layer-list" id="afLayerList"></div><div class="af-layer-foot"><button type="button" id="afTrashBtn" class="af-trash-btn" title="삭제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 7h2v8h-2v-8Zm4 0h2v8h-2v-8ZM7 10h2v8H7v-8Zm-1 10h12l1-12H5l1 12Z" fill="currentColor"/></svg></button></div></section></aside></div></div></div><style>
+<div id="af-tutorial" data-au-owner="AFFINITY-UNIVERSE" data-au-build="AU-TUT-20260824-02" data-au-fingerprint="B640BFCA817E5101" data-au-distribution="protected" class="laundry-gothic af-v125-intro-open" style="font-family:'LaundryGothic',sans-serif;"><div class="af-start" id="afStart"><div class="af-start-card"><div class="af-start-badge">AFFINITY UNIVERSE</div><h2>Mini Designer Tutorial</h2><p>도형 만들기, 컬러, 스트로크, 레이어, Export PNG까지<br>차근차근 먼저 익혀봐요.</p><button type="button" id="afStartBtn">디자이너 되어보기</button></div></div><div class="af-toast" id="afToast">Good Job!</div><div class="af-app"><header class="af-topbar"><section class="af-mission-top" id="afMissionCard"><div class="af-mission-kicker"><span>TODAY MISSION</span><b id="afMissionStep">1 / 24</b></div><div class="af-mission-body"><strong id="afMissionTitle">파일 이름 바꾸기</strong><span id="afMissionDesc">상단의 Untitled를 눌러 원하는 이름으로 바꿔보세요.</span></div></section><div class="af-top-actions"><button type="button" class="af-export" id="afExport">Export PNG</button></div></header><div class="af-workspace"><aside class="af-toolbar"><button type="button" class="af-tool active" data-tool="move" id="afMoveTool" title="Move Tool (V)"><svg viewBox="0 0 32 32"><path d="M7 3 L23 18 L15.5 18.8 L19.5 27.5 L15.6 29.2 L11.6 20.5 L7 26 Z" fill="#050505" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button><div class="af-shape-wrap"><button type="button" class="af-tool" data-tool="shape" id="afShapeTool" title="Shape Tool (U)"><span id="afShapeIcon" class="af-icon af-icon-rect"></span></button><div class="af-shape-menu" id="afShapeMenu"><button type="button" data-shape="rect"><span class="af-icon af-icon-rect"></span></button><button type="button" data-shape="circle"><span class="af-icon af-icon-circle"></span></button><button type="button" data-shape="round"><span class="af-icon af-icon-round"></span></button><button type="button" data-shape="triangle"><span class="af-icon af-icon-triangle"></span></button><button type="button" data-shape="star">★</button></div></div><div class="af-mini-targets"><button type="button" id="afMiniFill" class="active"></button><button type="button" id="afMiniStroke"></button></div></aside><main class="af-main"><div class="af-docbar"><input id="afFileName" type="text" enterkeyhint="done" value="Untitled" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" draggable="false"><span>@ 71%</span><em>V 무브툴 / U 도형툴 / ctrl(command)+Z / ctrl(command)+shift+Z / ctrl(command)+C,V / ctrl(command)+J / ctrl(command)+shift 드래그 / ctrl(command)+G / ctrl(command)+shift+G / 레이어 순서 단축키는 cmd(ctrl)+[ ], cmd(ctrl)+shift+[ ] 사용</em></div><div class="af-stage"><div class="af-artboard-wrap"><div class="af-artboard-label">Artboard1</div><div class="af-artboard" id="afArtboard"><div class="af-empty" id="afEmpty">도형 도구를 선택한 뒤<br>흰색 Artboard에서 드래그해보세요.</div><div class="af-drag-guide" id="afDragGuide"><strong>드래그란?</strong><span>마우스를 누른 채 움직이고 원하는 위치에서 손을 떼는 동작이에요.</span><i></i></div><div class="af-guide-overlay" id="afGuideOverlay"></div></div></div></div><div class="af-bottombar"><div><strong id="afStatusStrong">Ready</strong><span id="afStatusText">튜토리얼을 시작해보세요.</span></div><div><span id="afSelectionInfo">No Selection</span><span id="afCoord">X:0 / Y:0</span></div></div></main><aside class="af-sidebar"><section class="af-panel af-top-panel"><div class="af-tabs"><button type="button" class="active" data-panel="colour">Colour</button><button type="button" data-panel="stroke">Stroke</button></div><div class="af-tab-body active" id="afColourPanel"><div class="af-colour-topline"><div class="af-colour-targets"><button type="button" id="afBigFill" class="active" title="면 색상"></button><button type="button" id="afBigStroke" title="선 색상"></button><button type="button" id="afNoColor" title="색상 없음"></button><button type="button" id="afEyedropperV41" class="af-eyedropper-v41" title="스포이드 (I) · 색상 가져오기" aria-label="스포이드" aria-pressed="false"><svg viewBox="0 0 36 36" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22.4 4.5a4.8 4.8 0 0 1 6.8 0l2.3 2.3a4.8 4.8 0 0 1 0 6.8l-4.2 4.2-9.1-9.1 4.2-4.2Z"/><path d="M21.5 11.7 9.7 23.5a5.3 5.3 0 0 0-1.4 2.5l-.9 3.4 3.4-.9a5.3 5.3 0 0 0 2.5-1.4l11.8-11.8"/><path d="m8.7 24.6 2.7 2.7"/></svg></button><button type="button" id="afEyedropperSampleV41" class="af-eyedropper-sample-v41" title="추출한 색상을 도형에 적용" aria-label="추출한 색상 적용"></button></div><div class="af-colour-hexbox"><span>#:</span><b id="afHexText">EBEBEB</b></div></div><div class="af-wheel-wrap"><div class="af-wheel-stage" id="afWheelStage"><canvas id="afWheelCanvas" width="290" height="290"></canvas><button type="button" id="afHuePointer" class="af-wheel-pointer af-hue-pointer" aria-label="Hue pointer"></button><button type="button" id="afTriPointer" class="af-wheel-pointer af-tri-pointer" aria-label="Triangle pointer"></button></div></div><label class="af-range"><span>Opacity</span><input type="range" id="afOpacity" min="0" max="100" value="100"><b id="afOpacityText">100%</b></label></div><div class="af-tab-body" id="afStrokePanel"><div class="af-stroke-row"><span>Style</span><button type="button" class="active" data-stroke-style="none">None</button><button type="button" data-stroke-style="solid">Solid</button><button type="button" data-stroke-style="dotted">Dot</button></div><label class="af-range"><span>Width</span><input type="range" id="afStrokeWidth" min="0" max="30" value="0"><b id="afStrokeText">0pt</b></label></div></section><section class="af-panel af-layer-panel"><div class="af-layer-head"><div><strong>Layers</strong></div></div><div class="af-artboard-persistent-wrap-v10"><button type="button" id="afPersistentArtboardRowV10" class="af-persistent-artboard-row-v10" aria-expanded="true"><span class="af-persistent-arrow-v10">▾</span><span class="af-persistent-thumb-v10" aria-hidden="true"></span><span class="af-persistent-name-v10">Artboard1</span><span class="af-persistent-count-v10">0 layers</span></button></div><div class="af-layer-list" id="afLayerList"></div><div class="af-layer-foot"><button type="button" id="afTrashBtn" class="af-trash-btn" title="삭제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 7h2v8h-2v-8Zm4 0h2v8h-2v-8ZM7 10h2v8H7v-8Zm-1 10h12l1-12H5l1 12Z" fill="currentColor"/></svg></button></div></section></aside></div></div></div><style>
 .laundry-gothic {
   font-family: "LaundryGothic", sans-serif !important;
   font-weight: 400;
@@ -3010,7 +3005,9 @@ fileName.addEventListener("click",e=>e.stopPropagation());
 fileName.addEventListener("keydown",e=>{
 e.stopPropagation();
 syncKeyState(e);
-if(e.key==="Enter"){
+if(e.key==="Enter" && !e.isComposing && e.keyCode!==229 &&
+   !(typeof afV63FileComposing!=='undefined' && afV63FileComposing) &&
+   !(typeof afV73FilenameComposing!=='undefined' && afV73FilenameComposing)){
 e.preventDefault();
 fileName.blur();
 root.focus();
@@ -3425,7 +3422,12 @@ finishFileNameInput();
 }
 
 function forceFileNameDelete(e){
+// AU_V154: use native text editing and don't cancel an active IME commit.
+if(e.isComposing || e.keyCode===229 ||
+   (typeof afV63FileComposing!=='undefined' && afV63FileComposing) ||
+   (typeof afV73FilenameComposing!=='undefined' && afV73FilenameComposing))return false;
 const key=e.key;
+if(key==='Backspace'||key==='Delete')return false;
 const s=fileName.selectionStart ?? fileName.value.length;
 const en=fileName.selectionEnd ?? s;
 
@@ -9265,25 +9267,14 @@ let afV63FileComposing=false;
 let afV63FileRenameDone=false;
 
 function afV63CleanRepeatedTail(value){
-let v=String(value||'');
-// 브라우저/IME 조합에서 마지막 단어가 두 번 붙는 경우만 정리합니다. 예: "네임네임" → "네임", "보드 테스트테스트" → "보드 테스트"
-try{
-v=v.replace(/(^|[\s_\-])([\p{L}\p{N}]{2,20})\2$/u,'$1$2');
-}catch(e){
-v=v.replace(/(^|[\s_\-])([A-Za-z0-9가-힣]{2,20})\2$/,'$1$2');
-}
-return v;
+  // AU_V154: Never rewrite user-entered text. Repeated characters,
+  // words, and IME composition updates are all valid input.
+  return String(value ?? '');
 }
 
 function afV63NormalizeFileName(){
 if(!fileName)return '';
-const cleaned=afV63CleanRepeatedTail(fileName.value);
-if(cleaned!==fileName.value){
-const pos=Math.min(cleaned.length, fileName.selectionStart||cleaned.length);
-fileName.value=cleaned;
-try{fileName.setSelectionRange(pos,pos);}catch(e){}
-}
-return fileName.value.trim();
+return (fileName.value||'').trim();
 }
 
 function afV63FileRenameReady(){
@@ -9298,7 +9289,7 @@ afV63FileComposing=false;
 setTimeout(()=>afV63NormalizeFileName(),0);
 },true);
 fileName.addEventListener('blur',()=>{
-afV63NormalizeFileName();
+if(afV63FileComposing)return; // don't finish during Hangul composition
 if(afV63FileRenameReady()&&!afV63FileRenameDone){
 afV63FileRenameDone=true;
 next('파일 이름 변경 성공!');
@@ -9474,43 +9465,14 @@ return /[가-힣]/.test(String(text||''));
 }
 
 function afV64CleanFileNameValue(value){
-let v=String(value||'');
-v=v.replace(/[\u200B\uFEFF]/g,'');
-
-// 1) 한글 IME에서 마지막 음절이 한 번 더 붙는 케이스: "네임임" → "네임"
-v=v.replace(/([가-힣])\1$/,'$1');
-
-// 2) 마지막 단어 전체가 한 번 더 붙는 케이스: "네임네임" → "네임", "아트보드 테스트테스트" → "아트보드 테스트"
-const maxLen=Math.min(28,Math.floor(v.length/2));
-for(let len=maxLen;len>=1;len--){
-const tail=v.slice(-len);
-const prev=v.slice(-len*2,-len);
-if(tail && tail===prev && afV64HasHangul(tail)){
-v=v.slice(0,-len);
-break;
-}
-}
-
-// 3) 공백을 두고 같은 한글 단어가 한 번 더 들어간 케이스: "네임 네임" → "네임"
-v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,28})\s+\2$/u,'$1$2');
-
-return v;
+  // AU_V154: Never rewrite user-entered text. Repeated characters,
+  // words, and IME composition updates are all valid input.
+  return String(value ?? '');
 }
 
 function afV64NormalizeFileNameNow(){
 if(!fileName)return '';
-const before=fileName.value;
-const cleaned=afV64CleanFileNameValue(before);
-if(cleaned!==before){
-const oldPos=fileName.selectionStart==null?cleaned.length:fileName.selectionStart;
-const diff=before.length-cleaned.length;
-fileName.value=cleaned;
-try{
-const pos=Math.max(0,Math.min(cleaned.length,oldPos-diff));
-fileName.setSelectionRange(pos,pos);
-}catch(e){}
-}
-return fileName.value.trim();
+return (fileName.value||'').trim();
 }
 
 function afV64RenameReady(){
@@ -10743,26 +10705,14 @@ let afV73FilenameComposing=false;
 let afV73FilenameCommitted=false;
 
 function afV73CleanFilename(value){
-let v=String(value||'').replace(/[\u200B\uFEFF]/g,'').trim();
-// IME/브라우저 조합에서 마지막 글자 또는 단어가 한 번 더 붙는 케이스 정리
-v=v.replace(/([가-힣A-Za-z0-9])\1$/u,'$1');
-for(let len=Math.min(32,Math.floor(v.length/2));len>=1;len--){
-const a=v.slice(-len), b=v.slice(-len*2,-len);
-if(a && a===b){v=v.slice(0,-len);break;}
-}
-v=v.replace(/(^|\s)([가-힣A-Za-z0-9_\-]{1,32})\s+\2$/u,'$1$2');
-return v;
+  // AU_V154: Never rewrite user-entered text. Repeated characters,
+  // words, and IME composition updates are all valid input.
+  return String(value ?? '');
 }
 
 function afV73NormalizeFilename(){
 if(!fileName)return '';
-const before=fileName.value;
-const cleaned=afV73CleanFilename(before);
-if(cleaned!==before){
-fileName.value=cleaned;
-try{fileName.setSelectionRange(cleaned.length,cleaned.length);}catch(e){}
-}
-return cleaned;
+return fileName.value;
 }
 
 function afV73CommitFilename(){
@@ -10780,18 +10730,17 @@ if(fileName){
 fileName.addEventListener('compositionstart',e=>{afV73FilenameComposing=true;},true);
 fileName.addEventListener('compositionend',e=>{
 afV73FilenameComposing=false;
-setTimeout(()=>{afV73NormalizeFilename();},0);
-setTimeout(()=>{afV73NormalizeFilename();},60);
+// Let Safari commit the final syllable before validating the name.
+setTimeout(()=>{
+  if(document.activeElement!==fileName)afV73CommitFilename();
+},90);
 },true);
 fileName.addEventListener('input',e=>{
 if(e.target!==fileName)return;
 e.stopImmediatePropagation();
 clearTimeout(afV64RenameTimer);
 clearTimeout(afV40RenameTimer);
-if(!afV73FilenameComposing){
-setTimeout(()=>afV73NormalizeFilename(),0);
-setTimeout(()=>afV73NormalizeFilename(),60);
-}
+// Keep the raw value untouched; iPad Safari manages IME composition natively.
 },true);
 fileName.addEventListener('keydown',e=>{
 if(e.target!==fileName)return;
@@ -10806,7 +10755,7 @@ try{fileName.blur();}catch(err){}
 },true);
 fileName.addEventListener('blur',e=>{
 if(e.target!==fileName)return;
-setTimeout(()=>afV73CommitFilename(),0);
+setTimeout(()=>afV73CommitFilename(),100);
 },true);
 }
 
@@ -17165,7 +17114,7 @@ art.addEventListener('pointerup',()=>{
 const ex0=exportBtn&&exportBtn.onclick;if(exportBtn)exportBtn.onclick=function(e){let c=cur();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e&&e.preventDefault&&e.preventDefault();say('먼저 파일 이름을 바꿔볼까요?');try{fileName.focus();fileName.select()}catch(x){}return}if(c&&c.type==='export')try{hideGuide()}catch(x){}return ex0?ex0.call(this,e):undefined};
 function go(k){if(window.__auIpadOnly)return;clearTimeout(rt);rt=setTimeout(()=>{let i=missions.findIndex(x=>x&&x.key===k);if(i>=0){mission=i;renderMission()}},120)}
 fileName.addEventListener('keydown',e=>{let c=cur();if(c&&(e.key==='Enter'||e.key==='Tab')&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e.preventDefault();go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')}},true);
-fileName.addEventListener('input',()=>{let c=cur(),v=fileName.value.trim().toLowerCase();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')&&v&&v!=='untitled')go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')},true);
+/* AU_V154: no auto-advance while filename is being typed. */
 afV50PlayMissionHtml=()=>celebrate();
 const ug=updateGuideState;updateGuideState=function(){
 const r=ug.apply(this,arguments),c=cur(),animal=guideAnimal(c);
