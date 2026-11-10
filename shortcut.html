@@ -5862,7 +5862,9 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
       state.score += 300;
       state.suppressWrongAudioUntil = performance.now() + 2200;
       clearWrongAudioTimers();
-      floatingWord('MISSION CLEAR!', 'combo-big-word');
+      if (!state.suppressMissionCueDuringLevelUp && state.correctInLevel < CORRECT_PER_LEVEL) {
+        floatingWord('MISSION CLEAR!', 'combo-big-word');
+      }
       showCharacterBurst('mission', area.clientWidth / 2, area.clientHeight * 0.45, 4);
       makeBorderFx('legend');
       updateUI();
@@ -5952,9 +5954,9 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
     makeBorderFx('legend');
     showCharacterBurst('boss', area.clientWidth / 2, area.clientHeight * 0.42, 4);
     updateMissionUI();
-    setCenterMessage('BOSS ROUND!', '제한 시간 안에 ' + state.bossRound.target + '개를 맞혀보세요!', '성공하면 보너스 점수를 받습니다.');
-    showCenterMessage();
-    window.setTimeout(function () { if (state.running && !state.paused) hideCenterMessage(); }, 780);
+    // Boss scoring remains active; do not put a second plain-text overlay
+    // behind the LEVEL UP / SPEED UP vector effects at levels 5 and 10.
+    hideCenterMessage();
   }
 
   function completeBossRound() {
@@ -6069,9 +6071,17 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
     const title = document.createElement('strong');
     title.textContent = 'GAME OVER';
     if(window.auApplyCueVector)window.auApplyCueVector(title,'GAME OVER');
+    overlay.classList.add('au-ending-persistent-v15');
     const description = document.createElement('span');
+    description.className = 'au-ending-caption-v15';
     const name = (playerNameInput && playerNameInput.value.trim()) || 'Player';
-    description.textContent = name + ' · ' + state.score + '점 · LEVEL ' + state.level;
+    const firstLine = document.createElement('span');
+    firstLine.className = 'au-ending-line-v15';
+    firstLine.textContent = 'LEVEL ' + state.level;
+    const secondLine = document.createElement('span');
+    secondLine.className = 'au-ending-line-v15';
+    secondLine.textContent = name + ' · ' + state.score + '점';
+    description.append(firstLine, secondLine);
     overlay.append(title, description);
     area.appendChild(overlay);
   }
@@ -6323,7 +6333,9 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
     soundSiren();
     sirenFlash();
     showCharacterBurst('levelup', area.clientWidth / 2, area.clientHeight * 0.42, 4);
-    syncMissionState();
+    state.suppressMissionCueDuringLevelUp = true;
+    try { syncMissionState(); }
+    finally { state.suppressMissionCueDuringLevelUp = false; }
     if (state.level === 5 || state.level === 10) startBossRound(state.level, { suppressFloating: true });
     updateUI();
     refreshBgmTempo();
@@ -6580,8 +6592,23 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
   function showFinalMissionComplete() {
     area.querySelectorAll(".asg-mission-complete-stage").forEach(function (el) { el.remove(); });
     const stage = document.createElement("div");
-    stage.className = "asg-mission-complete-stage";
-    stage.innerHTML = '<strong>MISSION COMPLETE!</strong><span>LEVEL 10 CLEAR · TRAINING FINISHED</span>';
+    stage.className = "asg-mission-complete-stage au-ending-persistent-v15";
+    stage.innerHTML = '<strong class="au-mission-title-v13" role="img" aria-label="MISSION COMPLETE!"><span class="au-mission-word-v13" style="--au-word-ratio:5.53594"><svg viewBox="56 -1538 8780 1586" aria-hidden="true" focusable="false"><path d="M80 0H488V576C488 672 480 863 475 1047C523 865 573 677 604 576L780 0H1116L1289 576C1320 681 1372 878 1419 1065C1415 876 1406 676 1406 576V0H1814V1490H1191L1059 1024C1030 923 986 750 948 597C910 750 865 923 836 1024L702 1490H80ZM2390 1490H1974V0H2390ZM3174 -24C3578 -24 3809 154 3809 466C3809 704 3664 836 3322 899L3202 921C3047 949 2980 987 2980 1058C2980 1133 3062 1186 3179 1186C3303 1186 3386 1122 3396 1018H3778C3768 1330 3543 1514 3171 1514C2809 1514 2562 1321 2562 1038C2562 817 2718 664 3006 609L3154 581C3322 549 3398 507 3398 435C3398 357 3310 304 3179 304C3028 304 2933 375 2927 496H2534C2534 161 2761 -24 3174 -24ZM4577 -24C4981 -24 5212 154 5212 466C5212 704 5067 836 4725 899L4605 921C4450 949 4383 987 4383 1058C4383 1133 4465 1186 4582 1186C4706 1186 4789 1122 4799 1018H5181C5171 1330 4946 1514 4574 1514C4212 1514 3965 1321 3965 1038C3965 817 4121 664 4409 609L4557 581C4725 549 4801 507 4801 435C4801 357 4713 304 4582 304C4431 304 4336 375 4330 496H3937C3937 161 4164 -24 4577 -24ZM5772 1490H5356V0H5772ZM6616 -24C7021 -24 7340 247 7340 744C7340 1242 7021 1514 6616 1514C6209 1514 5892 1242 5892 744C5892 250 6209 -24 6616 -24ZM6616 336C6421 336 6312 487 6312 744C6312 1002 6421 1154 6616 1154C6812 1154 6920 1002 6920 744C6920 487 6812 336 6616 336ZM7460 0H7876V544C7876 604 7876 721 7871 855C7941 726 8007 611 8049 544L8388 0H8812V1490H8396V944C8396 873 8397 752 8401 631C8343 738 8282 849 8247 905L7884 1490H7460Z" transform="scale(1,-1)" fill="#fff"/></svg></span><span class="au-mission-word-v13" style="--au-word-ratio:7.47100"><svg viewBox="16 -1538 11849 1586" aria-hidden="true" focusable="false"><path d="M764 -24C1145 -24 1414 208 1456 560H1037C1011 420 915 336 772 336C569 336 460 484 460 744C460 1005 570 1154 772 1154C915 1154 1012 1069 1037 928H1456C1415 1280 1145 1514 764 1514C357 1514 40 1242 40 744C40 250 357 -24 764 -24ZM2258 -24C2663 -24 2982 247 2982 744C2982 1242 2663 1514 2258 1514C1851 1514 1534 1242 1534 744C1534 250 1851 -24 2258 -24ZM2258 336C2063 336 1954 487 1954 744C1954 1002 2063 1154 2258 1154C2454 1154 2562 1002 2562 744C2562 487 2454 336 2258 336ZM3102 0H3510V576C3510 672 3502 863 3497 1047C3545 865 3595 677 3626 576L3802 0H4138L4311 576C4342 681 4394 878 4441 1065C4437 876 4428 676 4428 576V0H4836V1490H4213L4081 1024C4052 923 4008 750 3970 597C3932 750 3887 923 3858 1024L3724 1490H3102ZM4996 0H5412V450H5629C5985 450 6208 651 6208 970C6208 1289 5985 1490 5629 1490H4996ZM5412 792V1148H5598C5723 1148 5802 1079 5802 970C5802 861 5723 792 5598 792ZM6323 0H7381V352H6739V1490H6323ZM7501 0H8655V352H7917V574H8598V914H7917V1138H8655V1490H7501ZM8755 1138H9179V0H9595V1138H10019V1490H8755ZM10139 0H11293V352H10555V574H11236V914H10555V1138H11293V1490H10139ZM11455 472H11803L11841 1490H11417ZM11629 -19C11744 -19 11837 74 11837 189C11837 304 11744 397 11629 397C11514 397 11421 304 11421 189C11421 74 11514 -19 11629 -19Z" transform="scale(1,-1)" fill="#fff"/></svg></span></strong><span class="au-mission-subtitle-v13">LEVEL 10 CLEAR · TRAINING FINISHED</span>';
+    const plate = document.createElement('div');
+    plate.className = 'au-ending-plate-v15';
+    plate.setAttribute('aria-hidden','true');
+    stage.prepend(plate);
+    const cap = stage.querySelector('.au-mission-subtitle-v13');
+    if (cap) {
+      cap.classList.add('au-ending-caption-v15');
+      cap.replaceChildren();
+      ['LEVEL 10 CLEAR','TRAINING FINISHED'].forEach(function (text) {
+        const row=document.createElement('span');
+        row.className='au-ending-line-v15';
+        row.textContent=text;
+        cap.appendChild(row);
+      });
+    }
     area.appendChild(stage);
 
     for (let i = 0; i < 42; i++) {
@@ -6597,12 +6624,31 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
       stage.appendChild(spark);
     }
 
-    window.setTimeout(function () { stage.remove(); }, 3600);
+    // The result interstitial will transition to the original final screen after 2 seconds.
   }
 
   function clearTransientEffects() {
     clearReferencePraise();
     area.querySelectorAll(".asg-gameover-dim,.asg-typing-gameover,.asg-portal-ring,.asg-siren-flash,.asg-green-wave,.asg-border-fx,.asg-floating-word,.asg-heart-pop,.asg-combo-icon,.asg-stink,.asg-cry,.asg-lost-heart,.asg-shard,.asg-character-pop,.asg-mission-complete-stage,.asg-ref-fw,.asg-reference-praise").forEach((el) => el.remove());
+  }
+
+  // Restore the original result dialog automatically, after a two-second end cue.
+  // A generation token stops an old run from opening the dialog after Restart.
+  let auEndingTimerV16 = 0;
+  let auEndingTokenV16 = 0;
+  function cancelEndingTimerV16() {
+    ++auEndingTokenV16;
+    window.clearTimeout(auEndingTimerV16);
+    auEndingTimerV16 = 0;
+  }
+  function scheduleEndingDialogV16() {
+    cancelEndingTimerV16();
+    const token = auEndingTokenV16;
+    auEndingTimerV16 = window.setTimeout(function () {
+      auEndingTimerV16 = 0;
+      if (token !== auEndingTokenV16 || state.running || !root.classList.contains('asg-ended')) return;
+      showFinalNextGamesV11();
+    }, 2000);
   }
 
   function showFinalNextGamesV11() {
@@ -6636,6 +6682,7 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
   }
 
   function startGame() {
+    cancelEndingTimerV16();
     stopAnimationLoop();
     enableCollisionLock();
     unlockAudio();
@@ -6715,6 +6762,7 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
   }
 
   function resetGame() {
+    cancelEndingTimerV16();
     stopAnimationLoop();
     root.classList.remove("asg-playing", "asg-ended");
     root.classList.add("asg-ready");
@@ -6797,7 +6845,7 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
     renderReview();
     updateUI();
 
-    window.setTimeout(showFinalNextGamesV11, 3300);
+    scheduleEndingDialogV16();
   }
 
   function endGame() {
@@ -6833,7 +6881,7 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
       card.el.style.setProperty("--fall-rot", randomBetween(-220, 220) + "deg");
     });
 
-    window.setTimeout(function () { clearCards(); }, 1300);
+    window.setTimeout(function () { if (!state.running && root.classList.contains("asg-ended")) clearCards(); }, 1300);
 
     hideCenterMessage();
     area.querySelectorAll(".asg-floating-word").forEach(function (el) { el.remove(); });
@@ -6846,9 +6894,7 @@ function auPlayIpadClip(src,volume=1,duckMs=0){
     saveCurrentRanking();
     renderReview();
 
-    window.setTimeout(function () {
-      showFinalNextGamesV11();
-    }, 4050);
+    scheduleEndingDialogV16();
 
   }
 
@@ -8567,5 +8613,408 @@ body { display:block !important; min-height:100vh !important; background:#0b1328
   window.addEventListener('resize',sync,{passive:true});
 })();
 </script>
+
+<style id="auShortcutMissionCompleteUnifiedV13">
+/* MISSION COMPLETE uses the same fixed Inter Display Black vector outlines as
+   GAME OVER. No device font fallback. The glow is blue, not yellow. */
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage {
+  box-sizing:border-box !important;
+  padding:14px !important;
+  overflow:visible !important;
+  gap:clamp(11px,2.1vw,22px) !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage > strong.au-mission-title-v13 {
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:clamp(9px,1.7vw,20px) !important;
+  max-width:calc(100% - 12px) !important;
+  width:auto !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  --au-mission-h:clamp(30px,4.3vw,62px);
+  font-size:0 !important;
+  line-height:0 !important;
+  letter-spacing:0 !important;
+  white-space:normal !important;
+  color:transparent !important;
+  -webkit-text-stroke:0 transparent !important;
+  paint-order:normal !important;
+  text-shadow:none !important;
+  filter:none !important;
+  animation:asgPremiumMissionTextClean 3.25s cubic-bezier(.18,.92,.18,1) both !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage > strong.au-mission-title-v13 > span.au-mission-word-v13 {
+  box-sizing:border-box !important;
+  display:block !important;
+  flex:0 1 auto !important;
+  width:calc(var(--au-word-ratio) * var(--au-mission-h)) !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  height:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  overflow:visible !important;
+  animation:none !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage .au-mission-word-v13 svg {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  overflow:visible !important;
+  fill:#fff !important;
+  filter:drop-shadow(0 0 6px rgba(205,238,255,.96))
+         drop-shadow(0 0 15px rgba(85,169,255,.88))
+         drop-shadow(0 0 25px rgba(27,107,255,.76)) !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage .au-mission-word-v13 svg path {
+  fill:#fff !important;
+  stroke:none !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage > span.au-mission-subtitle-v13 {
+  padding:0 !important;
+  color:#deecff !important;
+  font-size:clamp(10px,1.3vw,17px) !important;
+  line-height:1.3 !important;
+  text-shadow:0 0 8px rgba(80,154,255,.35) !important;
+  letter-spacing:.035em !important;
+  text-align:center !important;
+  white-space:normal !important;
+}
+/* Phones and narrow tablets: MISSION / COMPLETE! on separate centered lines. */
+@media(max-width:820px) {
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage > strong.au-mission-title-v13 {
+    --au-mission-h:clamp(27px,8vw,43px);
+    flex-direction:column !important;
+    gap:clamp(8px,1.9vh,14px) !important;
+    max-width:calc(100% - 10px) !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage > strong.au-mission-title-v13 > span.au-mission-word-v13 {
+    max-width:calc(100vw - 44px) !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage > span.au-mission-subtitle-v13 {
+    max-width:calc(100% - 18px) !important;
+    font-size:clamp(10px,2.5vw,13px) !important;
+  }
+}
+</style>
+
+
+<style id="auPersistentEndingV15">
+/* Shared final-state design for both languages and both games.
+   End messages persist until the player actively restarts or chooses another game. */
+#app .game .gameover.au-ending-persistent-v15,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15,
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 {
+  box-sizing:border-box !important;
+  padding:clamp(18px,4vw,36px) !important;
+  gap:0 !important;
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+  overflow:hidden !important;
+  color:#fff !important;
+}
+#app .game .gameover.au-ending-persistent-v15::before,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15::before,
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15::before {
+  box-sizing:border-box !important;
+  width:min(660px,calc(100% - 24px)) !important;
+  height:clamp(226px,59%,320px) !important;
+  max-height:calc(100% - 16px) !important;
+  border:1px solid rgba(106,169,255,.43) !important;
+  border-radius:clamp(20px,5vw,34px) !important;
+  background:#101e3a !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.35),0 0 24px rgba(43,112,236,.09) !important;
+  opacity:1 !important;
+  animation:none !important;
+  filter:none !important;
+  transform:none !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+/* Mission complete uses a translucent backdrop and an existing SVG title.
+   A real plate element avoids legacy pseudo-element stacking rules. */
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15::before {
+  display:none !important;
+  content:none !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > .au-ending-plate-v15 {
+  box-sizing:border-box !important;
+  position:absolute !important;
+  top:50% !important;
+  left:50% !important;
+  width:min(660px,calc(100% - 24px)) !important;
+  height:clamp(226px,59%,320px) !important;
+  max-height:calc(100% - 16px) !important;
+  transform:translate(-50%,-50%) !important;
+  border:1px solid rgba(106,169,255,.43) !important;
+  border-radius:clamp(20px,5vw,34px) !important;
+  background:#101e3a !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.35),0 0 24px rgba(43,112,236,.09) !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+@media(max-width:820px) {
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > .au-ending-plate-v15 {
+    width:calc(100% - 22px) !important;
+    height:clamp(228px,59%,315px) !important;
+    max-height:calc(100% - 12px) !important;
+    border-radius:25px !important;
+  }
+}
+/* Mission complete uses a translucent backdrop and an existing SVG title. */
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 {
+  background:rgba(3,9,26,.90) !important;
+  backdrop-filter:blur(3px) !important;
+  -webkit-backdrop-filter:blur(3px) !important;
+}
+#app .game .gameover.au-ending-persistent-v15 > strong,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > strong {
+  box-sizing:border-box !important;
+  display:block !important;
+  flex:none !important;
+  width:auto;
+  max-width:calc(100% - 28px) !important;
+  min-width:0 !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  position:relative !important;
+  z-index:2 !important;
+  font-family:"Pinkfong Baby Shark",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif !important;
+  font-size:clamp(42px,11vw,92px) !important;
+  line-height:1.02 !important;
+  letter-spacing:-.035em !important;
+  white-space:nowrap !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  -webkit-text-stroke:0 transparent !important;
+  paint-order:normal !important;
+  text-shadow:0 0 5px rgba(240,251,255,.93),0 0 15px rgba(119,206,255,.82),0 0 30px rgba(25,114,255,.68) !important;
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+  filter:none !important;
+  will-change:auto !important;
+}
+/* Fixed-vector GAME OVER is kept, with exactly the same blue light as FINISH. */
+#app .game .gameover.au-ending-persistent-v15 > strong.au-cue-vector-v6,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > strong.au-cue-vector-v6 {
+  width:clamp(170px,69vw,550px) !important;
+  max-width:calc(100% - 28px) !important;
+  height:auto !important;
+}
+#app .game .gameover.au-ending-persistent-v15 > strong.au-cue-vector-v6 > svg,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > strong.au-cue-vector-v6 > svg {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  fill:#fff !important;
+  filter:drop-shadow(0 0 5px rgba(240,251,255,.90))
+         drop-shadow(0 0 13px rgba(119,206,255,.81))
+         drop-shadow(0 0 22px rgba(25,114,255,.65)) !important;
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > strong.au-mission-title-v13 {
+  box-sizing:border-box !important;
+  position:relative !important;
+  z-index:2 !important;
+  opacity:1 !important;
+  animation:none !important;
+  filter:none !important;
+  transform:none !important;
+  --au-mission-h:clamp(22px,3vw,43px);
+}
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > strong.au-mission-title-v13 .au-mission-word-v13,
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > strong.au-mission-title-v13 svg {
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+}
+#app .game .gameover.au-ending-persistent-v15 > .au-ending-caption-v15,
+#affinityShortcutGame .asg-game-area .asg-typing-gameover.au-ending-persistent-v15 > .au-ending-caption-v15,
+#affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > .au-ending-caption-v15 {
+  box-sizing:border-box !important;
+  position:relative !important;
+  z-index:2 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  flex:none !important;
+  width:min(590px,calc(100% - 36px)) !important;
+  max-width:calc(100% - 36px) !important;
+  min-width:0 !important;
+  margin:clamp(14px,3vh,21px) auto 0 !important;
+  padding:0 !important;
+  background:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  text-align:center !important;
+  color:#fff !important;
+  font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif !important;
+  font-size:clamp(12px,3.25vw,18px) !important;
+  font-weight:700 !important;
+  line-height:1.3 !important;
+  letter-spacing:0 !important;
+  text-shadow:0 0 9px rgba(81,159,255,.42) !important;
+  white-space:normal !important;
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+  filter:none !important;
+  overflow:visible !important;
+}
+#app .game .gameover.au-ending-persistent-v15 .au-ending-caption-v15 > .au-ending-line-v15,
+#affinityShortcutGame .asg-game-area .au-ending-persistent-v15 .au-ending-caption-v15 > .au-ending-line-v15 {
+  display:block !important;
+  position:relative !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  color:#fff !important;
+  font:inherit !important;
+  line-height:1.3 !important;
+  letter-spacing:0 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:keep-all !important;
+  text-align:center !important;
+  text-shadow:inherit !important;
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+}
+/* Optional action replaces the auto-dismiss timer, preserving navigation. */
+#app .game .au-ending-persistent-v15 > button.au-ending-next-v15,
+#affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > button.au-ending-next-v15 {
+  box-sizing:border-box !important;
+  position:relative !important;
+  z-index:4 !important;
+  flex:0 0 auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:clamp(126px,32vw,180px) !important;
+  max-width:calc(100% - 44px) !important;
+  min-height:39px !important;
+  height:auto !important;
+  margin:clamp(16px,3vh,23px) auto 0 !important;
+  padding:9px 16px !important;
+  background:#0d62ed !important;
+  border:1px solid rgba(189,224,255,.90) !important;
+  border-radius:12px !important;
+  color:#fff !important;
+  font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif !important;
+  font-size:clamp(12px,3vw,15px) !important;
+  font-weight:800 !important;
+  line-height:1.2 !important;
+  text-shadow:0 0 9px rgba(115,198,255,.35) !important;
+  box-shadow:0 5px 19px rgba(0,96,255,.25) !important;
+  white-space:normal !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  opacity:1 !important;
+  animation:none !important;
+  transform:none !important;
+}
+#app .game .au-ending-persistent-v15 > button.au-ending-next-v15:hover,
+#affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > button.au-ending-next-v15:hover {background:#247cff !important;}
+#app .game .au-ending-persistent-v15 > button.au-ending-next-v15:focus-visible,
+#affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > button.au-ending-next-v15:focus-visible {
+  outline:3px solid #b9e5ff !important;outline-offset:3px !important;
+}
+@media (max-width:820px) {
+  #app .game .gameover.au-ending-persistent-v15,
+  #affinityShortcutGame .asg-game-area .au-ending-persistent-v15 {
+    padding:14px !important;
+  }
+  #app .game .gameover.au-ending-persistent-v15::before,
+  #affinityShortcutGame .asg-game-area .au-ending-persistent-v15::before {
+    width:calc(100% - 22px) !important;
+    height:clamp(228px,59%,315px) !important;
+    max-height:calc(100% - 12px) !important;
+    border-radius:25px !important;
+  }
+  #app .game .gameover.au-ending-persistent-v15 > strong {
+    font-size:clamp(45px,12.3vw,65px) !important;
+  }
+  #app .game .gameover.au-ending-persistent-v15 > .au-ending-caption-v15,
+  #affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > .au-ending-caption-v15 {
+    width:calc(100% - 50px) !important;
+    max-width:calc(100% - 50px) !important;
+    font-size:clamp(12px,3.7vw,16px) !important;
+    margin-top:16px !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > strong.au-mission-title-v13 {
+    --au-mission-h:clamp(23px,8vw,40px);
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+  #affinityShortcutGame .asg-game-area .asg-mission-complete-stage.au-ending-persistent-v15 > strong.au-mission-title-v13 > span.au-mission-word-v13 {
+    max-width:calc(100% - 20px) !important;
+  }
+}
+@media (max-width:360px) {
+  #app .game .gameover.au-ending-persistent-v15 > strong {font-size:42px !important;}
+  #app .game .gameover.au-ending-persistent-v15 > .au-ending-caption-v15,
+  #affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > .au-ending-caption-v15 {font-size:12px !important;}
+  #app .game .au-ending-persistent-v15 > button.au-ending-next-v15,
+  #affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > button.au-ending-next-v15 {margin-top:12px !important;min-height:35px !important;}
+}
+</style>
+
+
+<style id="auEndingTransitionProgressSpaceV16">
+/* The level-10 description must wrap without clipping.  Do not change the
+   compact controls while the game is actively running. */
+#affinityShortcutGame:not(.asg-playing) .asg-level-panel {
+  box-sizing:border-box !important;
+  height:auto !important;
+  min-height:84px !important;
+  padding:14px 18px 19px !important;
+  margin-bottom:16px !important;
+  align-items:center !important;
+  overflow:visible !important;
+  row-gap:11px !important;
+}
+#affinityShortcutGame:not(.asg-playing) .asg-level-panel > div:first-child {min-width:0 !important;overflow:visible !important;}
+#affinityShortcutGame:not(.asg-playing) .asg-level-panel > div:first-child > span {
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+  white-space:normal !important;
+  word-break:keep-all !important;
+  overflow-wrap:break-word !important;
+  line-height:1.52 !important;
+  margin-top:5px !important;
+}
+#affinityShortcutGame:not(.asg-playing) .asg-progress-wrap {min-width:0 !important;padding-bottom:2px !important;}
+@media(max-width:700px) {
+  #affinityShortcutGame:not(.asg-playing) .asg-level-panel {
+    grid-template-columns:minmax(0,1fr) !important;
+    padding:12px 13px 18px !important;
+    min-height:108px !important;
+    margin-bottom:14px !important;
+  }
+}
+/* The end cue is deliberately buttonless.  A timer shows the original
+   full result chooser after 2 seconds for both victory and defeat. */
+#app .game .au-ending-persistent-v15 > .au-ending-next-v15,
+#affinityShortcutGame .asg-game-area .au-ending-persistent-v15 > .au-ending-next-v15 {display:none !important;}
+</style>
 </body>
 </html>
