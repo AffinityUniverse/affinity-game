@@ -3028,15 +3028,9 @@ window.addEventListener("resize",()=>{renderBox();if(currentGuideAnimal)showGuid
 fileName.addEventListener("pointerdown",e=>e.stopPropagation());
 fileName.addEventListener("click",e=>e.stopPropagation());
 fileName.addEventListener("keydown",e=>{
+// Never blur or force an IME commit in the base keyboard listener.
 e.stopPropagation();
 syncKeyState(e);
-if(e.key==="Enter" && !e.isComposing && e.keyCode!==229 &&
-   !(typeof afV63FileComposing!=='undefined' && afV63FileComposing) &&
-   !(typeof afV73FilenameComposing!=='undefined' && afV73FilenameComposing)){
-e.preventDefault();
-fileName.blur();
-root.focus();
-}
 });
 fileName.addEventListener("input",()=>{if(m().key==="rename"){afV64NormalizeFileNameNow();afV40ScheduleRenameComplete();}});
 $$(".af-mode").forEach(b=>b.onclick=()=>{$$(".af-mode").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
@@ -3298,7 +3292,9 @@ document.addEventListener("keydown",e=>{
 syncKeyState(e);
 const tag=(e.target.tagName||"").toLowerCase();
 if(tag==="input"||tag==="textarea"){
-if(e.key==="Enter"){
+// Filename input owns its Enter logic. Native IME must finish composing first.
+if(e.target===fileName)return;
+if(e.key==="Enter" && !e.isComposing && e.keyCode!==229){
 e.preventDefault();
 e.target.blur();
 root.focus();
@@ -3483,12 +3479,8 @@ return true;
 }
 
 if(key==="Enter"){
-e.preventDefault();
-e.stopImmediatePropagation();
-fileName.blur();
-root.focus();
-finishFileNameInput();
-return true;
+// The IME-aware rename handlers below will commit on a genuine Enter.
+return false;
 }
 
 return false;
@@ -3516,26 +3508,9 @@ fileName.addEventListener("keydown",e=>{
 forceFileNameDelete(e);
 },true);
 
-fileName.addEventListener("cut",e=>{
-e.stopPropagation();
-const s=fileName.selectionStart ?? 0;
-const en=fileName.selectionEnd ?? s;
-if(s!==en){
-e.preventDefault();
-const cutText=fileName.value.slice(s,en);
-try{e.clipboardData.setData("text/plain",cutText)}catch(err){}
-replaceFileNameRange("",s,en);
-}
-},true);
-
-fileName.addEventListener("paste",e=>{
-e.stopPropagation();
-const pasted=(e.clipboardData&&e.clipboardData.getData("text/plain"))||"";
-if(pasted){
-e.preventDefault();
-replaceFileNameRange(pasted,fileName.selectionStart??0,fileName.selectionEnd??fileName.selectionStart??0);
-}
-},true);
+fileName.addEventListener("cut",e=>{e.stopPropagation();},true);
+fileName.addEventListener("paste",e=>{e.stopPropagation();},true);
+// Use native cut/paste so Safari controls IME selection and caret placement.
 
 fileName.addEventListener("input",finishFileNameInput);
 
@@ -9313,13 +9288,8 @@ fileName.addEventListener('compositionend',()=>{
 afV63FileComposing=false;
 setTimeout(()=>afV63NormalizeFileName(),0);
 },true);
-fileName.addEventListener('blur',()=>{
-if(afV63FileComposing)return; // don't finish during Hangul composition
-if(afV63FileRenameReady()&&!afV63FileRenameDone){
-afV63FileRenameDone=true;
-next("File renamed successfully!");
-}
-},true);
+// AU_V155: V73 owns rename completion.
+fileName.addEventListener('blur',()=>{clearTimeout(afV40RenameTimer);},true);
 }
 
 finishFileNameInput=function(){
@@ -9506,7 +9476,7 @@ return m().key==='rename' && val && val.toLowerCase()!=='untitled';
 }
 
 function afV64ScheduleRenameComplete(delay=850){
-// Do not advance mid-word. An explicit Enter or leaving the field commits.
+// AU_V155: Never advance a mission on input/composition updates.
 clearTimeout(afV64RenameTimer);
 }
 
@@ -9542,13 +9512,8 @@ afV64ScheduleRenameComplete(900);
 }
 },true);
 
-fileName.addEventListener('blur',()=>{
-afV64NormalizeFileNameNow();
-if(afV64RenameReady()&&!afV63FileRenameDone){
-afV63FileRenameDone=true;
-next("File renamed successfully!");
-}
-},true);
+// AU_V155: preserve native text; V73 owns blur completion.
+fileName.addEventListener('blur',()=>{clearTimeout(afV64RenameTimer);},true);
 }
 
 afV63CleanRepeatedTail=function(value){
@@ -10757,6 +10722,7 @@ setTimeout(()=>{
 },true);
 fileName.addEventListener('input',e=>{
 if(e.target!==fileName)return;
+if(typeof window.__auFixFilenameImeInputV155==='function')window.__auFixFilenameImeInputV155(e);
 e.stopImmediatePropagation();
 clearTimeout(afV64RenameTimer);
 clearTimeout(afV40RenameTimer);
@@ -10765,6 +10731,11 @@ clearTimeout(afV40RenameTimer);
 fileName.addEventListener('keydown',e=>{
 if(e.target!==fileName)return;
 if(e.key==='Enter'){
+const pendingIME=e.isComposing||e.keyCode===229||afV73FilenameComposing||
+  afV63FileComposing||window.__auFilenameImeComposingV155;
+if(pendingIME)return; // First Enter finishes Hangul; do not close the editor.
+const key=m()&&m().key;
+if(key!=='rename')return; // Silhouette rename is owned by V123.
 e.preventDefault();e.stopImmediatePropagation();
 setTimeout(()=>{afV73CommitFilename();try{fileName.blur();}catch(err){}},0);
 }
@@ -17133,7 +17104,8 @@ art.addEventListener('pointerup',()=>{
 
 const ex0=exportBtn&&exportBtn.onclick;if(exportBtn)exportBtn.onclick=function(e){let c=cur();if(c&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e&&e.preventDefault&&e.preventDefault();say("First, rename the file.");try{fileName.focus();fileName.select()}catch(x){}return}if(c&&c.type==='export')try{hideGuide()}catch(x){}return ex0?ex0.call(this,e):undefined};
 function go(k){if(window.__auIpadOnly)return;clearTimeout(rt);rt=setTimeout(()=>{let i=missions.findIndex(x=>x&&x.key===k);if(i>=0){mission=i;renderMission()}},120)}
-fileName.addEventListener('keydown',e=>{let c=cur();if(c&&(e.key==='Enter'||e.key==='Tab')&&(c.key==='renameAfterSil'||c.key==='renameAfterPuppy')){e.preventDefault();go(c.key==='renameAfterSil'?'bunnyExport':'puppyExport')}},true);
+// AU_V155: V123 is the only Enter/Complete handler for silhouette names.
+// The old handler cancelled IME Enter and could double-commit the last syllable.
 /* AU_V154: no auto-advance while filename is being typed. */
 afV50PlayMissionHtml=()=>celebrate();
 const ug=updateGuideState;updateGuideState=function(){
@@ -18393,6 +18365,8 @@ renderMission=function(){
 };
 window.addEventListener('keydown',function(e){
   if(e.target!==fileName||e.key!=='Enter')return;
+  if(e.isComposing||e.keyCode===229||afV73FilenameComposing||
+     afV63FileComposing||window.__auFilenameImeComposingV155)return;
   const cur=afV123Cur();
   if(!afV123IsRename(cur))return;
   const expected=cur.key;
@@ -18405,7 +18379,10 @@ window.addEventListener('keydown',function(e){
     const cur=afV123Cur();
     if(!afV123IsRename(cur))return;
     const expected=cur.key;
-    setTimeout(function(){afV123Advance(expected);},100);
+    setTimeout(function(){
+      if(window.__auFilenameImeComposingV155||afV73FilenameComposing||afV63FileComposing)return;
+      afV123Advance(expected);
+    },180);
   },true);
 })();
 
@@ -26709,6 +26686,98 @@ html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="s"]{botto
 html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="sw"]{left:-17px!important;bottom:-17px!important}
 html.au-tablet-mode #af-tutorial .af-transform .af-handle[data-handle="w"]{left:-17px!important}
 </style>
+
+
+<!-- AU_V155_SAFE_FILENAME_IME: preserve native Korean IME composition on iPad Safari -->
+<script id="auSafeFilenameIMEV155">
+(function(){
+  'use strict';
+  const input=document.getElementById('afFileName');
+  if(!input || input.dataset.auImeGuardV155==='1') return;
+  input.dataset.auImeGuardV155='1';
+  window.__auFilenameImeComposingV155=false;
+
+  let started=null;
+  let justEnded=null;
+  let generation=0;
+  const now=()=>performance.now();
+  const hangul=/^[\uAC00-\uD7A3]$/u;
+  const lastCharacter=s=>Array.from(String(s||'')).slice(-1)[0]||'';
+
+  function clearPostCommit(){justEnded=null;}
+  function restoreValue(value){
+    if(input.value===value)return;
+    const active=document.activeElement===input;
+    input.value=value;
+    if(active){try{input.setSelectionRange(value.length,value.length);}catch(_e){}}
+    // Do not dispatch another input event here: older mission handlers must
+    // never interpret this native-IME correction as another user edit.
+  }
+  function doubleNativeCommit(event){
+    if(!justEnded || window.__auFilenameImeComposingV155)return false;
+    if(now()-justEnded.time>250){clearPostCommit();return false;}
+    if(event && event.inputType && !/insert(Text|FromComposition|CompositionText)/i.test(event.inputType))return false;
+    const {value,tail}=justEnded;
+    return !!tail && hangul.test(tail) && value.endsWith(tail) && input.value===value+tail;
+  }
+
+  input.addEventListener('compositionstart',function(){
+    ++generation;
+    window.__auFilenameImeComposingV155=true;
+    clearPostCommit();
+    started={value:input.value,start:input.selectionStart,end:input.selectionEnd,gen:generation};
+  },true);
+
+  input.addEventListener('compositionend',function(e){
+    window.__auFilenameImeComposingV155=false;
+    const data=String(e.data||'');
+    const tail=lastCharacter(data);
+    const endValue=input.value;
+    const began=started;
+    started=null;
+    if(!hangul.test(tail))return;
+    // In Safari, an IME may occasionally insert the same committed Hangul
+    // syllable twice before compositionend. Only correct an exact duplicate
+    // relative to the pre-composition value, not intentional repeated text.
+    if(began && began.end===began.start && began.start===began.value.length &&
+       endValue===began.value+data+tail && data.length===tail.length){
+      restoreValue(began.value+data);
+    }
+    justEnded={value:input.value,tail,time:now(),gen:generation};
+    const token=generation;
+    setTimeout(()=>{if(justEnded && justEnded.gen===token)clearPostCommit();},290);
+  },true);
+
+  input.addEventListener('beforeinput',function(e){
+    if(!justEnded || window.__auFilenameImeComposingV155)return;
+    if(now()-justEnded.time>250){clearPostCommit();return;}
+    const {value,tail}=justEnded;
+    if(!hangul.test(tail) || input.value!==value || !value.endsWith(tail))return;
+    const atEnd=input.selectionStart===value.length && input.selectionEnd===value.length;
+    if(atEnd && e.data===tail && /insert(Text|FromComposition|CompositionText)/i.test(e.inputType||'') && e.cancelable){
+      // Exactly the same final syllable was already committed by this IME.
+      e.preventDefault();
+      clearPostCommit();
+    }
+  },true);
+
+  function fixPostCompositionInput(e){
+    if(doubleNativeCommit(e)){
+      restoreValue(justEnded.value);
+      clearPostCommit();
+    }
+  }
+  window.__auFixFilenameImeInputV155=fixPostCompositionInput;
+  // Fallback for browsers that don't cancel input propagation in older code.
+  input.addEventListener('input',fixPostCompositionInput,true);
+
+  input.addEventListener('blur',function(){
+    // Never rewrite the text on blur. The filename mission commits using the
+    // existing Enter / Completed handler after the IME has finished.
+    if(!window.__auFilenameImeComposingV155)clearPostCommit();
+  },false);
+})();
+</script>
 
 </body>
 </html>
